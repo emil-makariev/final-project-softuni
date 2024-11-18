@@ -3,24 +3,33 @@ from django.utils.deconstruct import deconstructible
 
 
 @deconstructible
-class UserNameValidationTyping:
-    @deconstructible
-    class UserNameValidator:
-        def __init__(self, message="Username can only contain letters, numbers, or underscores"):
-            self.message = message
+class UserNameValidatorTyping:
+    def __init__(self, message=None):
+        self.message = message
 
-        def __call__(self, value):
-            if not all(letter.isalnum() or letter == '_' for letter in value):
-                raise ValidationError(self.message)
-            return value
+    @property
+    def message(self):
+        return self._message
+
+    @message.setter
+    def message(self, value):
+        if value is None:
+            self._message = 'Username can only contain letters, numbers, or underscores'
+        else:
+            self._message = value
+
+    def __call__(self, value):
+        if not all(letter.isalnum() or letter == '_' for letter in value):
+            raise ValidationError(self.message)
+        return value
 
 
 @deconstructible
 class UserNameLengthValidator:
     def __init__(self, min_length=3, max_length=20, message=None):
-        self._min_length = min_length  # Private attributes for min and max length
-        self._max_length = max_length
-        self._message = message or f"Username must be between {self._min_length} and {self._max_length} characters."
+        self.min_length = min_length
+        self.max_length = max_length
+        self.message = message
 
     @property
     def min_length(self):
@@ -48,16 +57,39 @@ class UserNameLengthValidator:
 
     @property
     def message(self):
-        """Getter for the error message."""
         return self._message
 
     @message.setter
     def message(self, value):
-        """Setter for the error message."""
-        self._message = value
+        if value is None:
+            self._message = f'Username must be between {self.min_length} and {self.max_length} characters.'
+        else:
+            self._message = value
 
     def __call__(self, value):
         """Apply the validation logic."""
         if len(value) < self._min_length or len(value) > self._max_length:
+            raise ValidationError(self.message)
+        return value
+
+
+@deconstructible
+class UsernameContainsNoSpacesValidator:
+    def __init__(self, message=None):
+        self.message = message
+
+    @property
+    def message(self):
+        return self._message
+
+    @message.setter
+    def message(self, value):
+        if value is None:
+            self._message = "Username cannot contain spaces."
+        else:
+            self._message = value
+
+    def __call__(self, value):
+        if ' ' in value:
             raise ValidationError(self.message)
         return value
