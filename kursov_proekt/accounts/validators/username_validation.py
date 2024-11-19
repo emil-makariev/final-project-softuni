@@ -19,14 +19,14 @@ class UserNameValidatorTyping:
             self._message = value
 
     def __call__(self, value):
-        if not all(letter.isalnum() or letter == '_' for letter in value):
+        if not all(letter.isalnum() or letter == '_' or letter == '.' for letter in value):
             raise ValidationError(self.message)
         return value
 
 
 @deconstructible
 class UserNameLengthValidator:
-    def __init__(self, min_length=3, max_length=20, message=None):
+    def __init__(self, min_length=None, max_length=None, message=None):
         self.min_length = min_length
         self.max_length = max_length
         self.message = message

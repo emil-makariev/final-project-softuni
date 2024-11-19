@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 from pathlib import Path
 import os
 
+from django.urls import reverse_lazy
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -99,7 +101,10 @@ DATABASES = {
         "PORT": "5432",
     },
 }
-
+AUTHENTICATION_BACKENDS = (
+    'kursov_proekt.accounts.authentication_backend.EmailOrUsernameBackend',
+    'django.contrib.auth.backends.ModelBackend',
+)
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
 
@@ -117,6 +122,7 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
@@ -146,3 +152,5 @@ AUTH_USER_MODEL = 'accounts.CustomBaseUser'
 
 MEDIA_ROOT = BASE_DIR / 'mediafiles/'
 MEDIA_URL = '/media/'
+LOGIN_REDIRECT_URL = reverse_lazy('common')
+Em

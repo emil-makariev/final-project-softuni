@@ -9,3 +9,4 @@ from kursov_proekt.product.models import Product
 class HomePage(ListView):
     model = Product
     template_name = 'common/index.html'
+
