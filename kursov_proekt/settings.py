@@ -36,6 +36,18 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'kursov_proekt.accounts',
+    'kursov_proekt.blog',
+    'kursov_proekt.carts',
+    'kursov_proekt.common',
+    'kursov_proekt.inventory',
+    'kursov_proekt.notifications',
+    'kursov_proekt.orders',
+    'kursov_proekt.product',
+    'kursov_proekt.promotions',
+    'kursov_proekt.reviews',
+    'kursov_proekt.search'
+
 ]
 
 MIDDLEWARE = [
@@ -46,6 +58,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'kursov_proekt.middlewares.ContextModification',
 ]
 
 ROOT_URLCONF = 'kursov_proekt.urls'
@@ -129,5 +142,7 @@ STATICFILES_DIRS = (
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+AUTH_USER_MODEL = 'accounts.CustomBaseUser'
+
+MEDIA_ROOT = BASE_DIR / 'mediafiles/'
 MEDIA_URL = '/media/'

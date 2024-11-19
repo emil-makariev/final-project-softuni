@@ -63,7 +63,7 @@ class Product(models.Model):
         max_length=100
     )
     main_image = models.ImageField(
-        upload_to='product_images/'
+        upload_to='mediafiles/'
     )
     category = models.ForeignKey(
         to=Category,
