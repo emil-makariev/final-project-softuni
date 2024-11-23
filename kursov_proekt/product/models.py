@@ -67,11 +67,11 @@ class Product(models.Model):
     )
     category = models.ForeignKey(
         to=Category,
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
     )
     product_type = models.ForeignKey(
         to=ProductType,
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
     )
     brand = models.CharField(
         max_length=100
@@ -85,6 +85,10 @@ class Product(models.Model):
     is_active = models.BooleanField(
         default=True
     )
+    class Meta:
+        permissions = [
+            ('can_create_products', 'Can create posts')
+        ]
 
     def __str__(self):
         return self.name
@@ -94,3 +98,4 @@ class Product(models.Model):
 
     def in_stock(self):
         return self.stock_quantity > 0
+

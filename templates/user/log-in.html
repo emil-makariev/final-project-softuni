@@ -15,8 +15,10 @@
 </head>
 <body>
 <div class="login-form">
-    <form action="/examples/actions/confirmation.php" method="post">
-        <h2 class="text-center">Log in</h2>       
+    <form action="" method="post">
+        <h2 class="text-center">Log in</h2>
+        {% csrf_token %}
+        {{  form.errors }}
         <div class="form-group">
             {{ form.username }}
         </div>

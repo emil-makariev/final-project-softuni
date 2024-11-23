@@ -76,7 +76,12 @@
                         <div class="header__top__right">
                             <div class="header__top__links">
                                 {% if user_logged_in  %}
-                                    <a href="#">Log Out</a>
+                                    <a href="{% url 'log-out' %}" onclick="event.preventDefault(); document.getElementById('logout_form').submit()" class="menu-link">
+                                            Log out
+                                    </a>
+                                    <form id="logout_form" method="post" action="{% url 'log-out' %}" style="display: none;">
+                                        {% csrf_token %}
+                                    </form>
                                 {% else %}
                                     <a href="{% url 'log-in' %}">Sign in</a>
                                 {% endif %}
@@ -105,8 +110,8 @@
                 <div class="col-lg-6 col-md-6">
                     <nav class="header__menu mobile-menu">
                         <ul>
-                            <li><a href="common/index.html">Home</a></li>
-                            <li><a href="common/shop.html">Shop</a></li>
+                            <li class="nav-item {% if request.path == '/' %}active {% endif %}" ><a href="{% url 'common' %}">Home</a></li>
+                            <li class="nav-item {% if request.path == '/product/all-products/' %}active {% endif %}"><a href="{% url 'all-products' %}">Shop</a></li>
                             <li><a href="#">Pages</a>
                                 <ul class="dropdown">
                                     <li><a href="shop-info/about.html">About Us</a></li>
@@ -116,7 +121,7 @@
                                     <li><a href="blog/blog-details.html">Blog Details</a></li>
                                 </ul>
                             </li>
-                            <li class="active"><a href="blog/blog.html">Blog</a></li>
+                            <li><a href="blog/blog.html">Blog</a></li>
                             <li><a href="shop-details/contact.html">Contacts</a></li>
                         </ul>
                     </nav>

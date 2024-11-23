@@ -13,6 +13,9 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 from pathlib import Path
 import os
 
+from dotenv import load_dotenv
+
+load_dotenv()
 from django.urls import reverse_lazy
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -48,9 +51,27 @@ INSTALLED_APPS = [
     'kursov_proekt.product',
     'kursov_proekt.promotions',
     'kursov_proekt.reviews',
-    'kursov_proekt.search'
+    'kursov_proekt.search',
+    'rest_framework',
+    'drf_spectacular',
 
 ]
+REST_FRAMEWORK = {
+    # YOUR SETTINGS
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    'DEFAULT_RENDER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer'
+    ]
+
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Library',
+    'DESCRIPTION': 'Rest project',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    # OTHER SETTINGS
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -102,8 +123,9 @@ DATABASES = {
     },
 }
 AUTHENTICATION_BACKENDS = (
-    'kursov_proekt.accounts.authentication_backend.EmailOrUsernameBackend',
     'django.contrib.auth.backends.ModelBackend',
+    'kursov_proekt.accounts.authentication_backend.EmailOrUsernameBackend',
+
 )
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
@@ -122,6 +144,7 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
 
 
 # Internationalization
@@ -153,4 +176,12 @@ AUTH_USER_MODEL = 'accounts.CustomBaseUser'
 MEDIA_ROOT = BASE_DIR / 'mediafiles/'
 MEDIA_URL = '/media/'
 LOGIN_REDIRECT_URL = reverse_lazy('common')
-Em
+LOGOUT_REDIRECT_URL = reverse_lazy('common')
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')  # Get email from environment
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')  # Get password from environment
+DEFAULT_FROM_EMAIL = os.getenv('EMAIL_HOST_USER')

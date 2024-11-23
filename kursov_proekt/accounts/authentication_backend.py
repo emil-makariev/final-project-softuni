@@ -12,7 +12,7 @@ class EmailOrUsernameBackend(ModelBackend):
             searched_user = custom_user_model.objects.get(email=username)
         except custom_user_model.DoesNotExist:
             try:
-                searched_user = custom_user_model.objects.get(name=username)
+                searched_user = custom_user_model.objects.get(username=username)
             except custom_user_model.DoesNotExist:
                 return None
 
