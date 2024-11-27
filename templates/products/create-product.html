@@ -1,0 +1,61 @@
+{% extends 'base-form-for-creation.html' %}
+{% load placeholder %}
+{% block create-form %}
+     <div class="signup-form">
+        <form action="" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <h2>Create a product</h2>
+            <p>Create a product for the app using this form</p>
+            <hr>
+            {{  form.errors }}
+            <div class="form-group">
+                {{ form.name|placeholder:"Name of the product" }}
+            </div>
+
+            <div class="form-group">
+                {{ form.description|placeholder:"Product description" }}
+            </div>
+
+            <div class="form-group">
+                {{ form.price|placeholder:"Product price" }}
+            </div>
+
+            <div class="form-group">
+                {{ form.discount_price|placeholder:"Discount price" }}
+            </div>
+
+            <div class="form-group">
+                {{ form.size|placeholder:"Product size" }}
+            </div>
+
+            <div class="form-group">
+                {{ form.color|placeholder:"Product color" }}
+            </div>
+            <div class="form-group">
+                {{ form.stock_quantity|placeholder:"Stock quantity" }}
+            </div>
+            <div class="form-group">
+                {{ form.sku|placeholder:"SKU" }}
+            </div>
+
+            <div class="form-group">
+                {{ form.main_image|placeholder:"Main image URL" }}
+            </div>
+
+            <div class="form-group">
+                {{ form.category|placeholder:"Product category" }}
+            </div>
+            <div class="form-group">
+                {{ form.brand|placeholder:"Brand name" }}
+            </div>
+
+            <div class="form-group">
+                {{ form.is_active|placeholder:"Is the product active?" }}
+                <div class="form-group">
+                <button type="submit" class="btn btn-primary btn-lg">Create the product</button>
+         </div>
+            </div>
+        </form>
+
+    </div>
+{% endblock %}

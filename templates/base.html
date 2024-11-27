@@ -79,6 +79,11 @@
                                     <a href="{% url 'log-out' %}" onclick="event.preventDefault(); document.getElementById('logout_form').submit()" class="menu-link">
                                             Log out
                                     </a>
+                                    {% if has_perm %}
+                                        <a href="{% url 'create-product' %}">
+                                            Create Product
+                                        </a>
+                                    {% endif %}
                                     <form id="logout_form" method="post" action="{% url 'log-out' %}" style="display: none;">
                                         {% csrf_token %}
                                     </form>

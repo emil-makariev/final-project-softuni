@@ -1,25 +1,12 @@
 from django.db import models
 
+from kursov_proekt.product.choices import SizeChoice, ColorChoice, BrandChoice
+
+
 # Create your models here.
 
 
 class Category(models.Model):
-    name = models.CharField(
-        max_length=100
-    )
-    description = models.TextField(
-        blank=True,
-        null=True
-    )
-
-    def __str__(self):
-        return self.name
-
-
-class ProductType(models.Model):
-    category = models.ForeignKey(
-        Category,
-        on_delete=models.CASCADE)
     name = models.CharField(
         max_length=100
     )
@@ -53,15 +40,12 @@ class Product(models.Model):
         unique=True
     )
     size = models.CharField(
-        max_length=20,
-        blank=True
+        choices=SizeChoice
     )
     color = models.CharField(
-        max_length=50
+        choices = ColorChoice
     )
-    material = models.CharField(
-        max_length=100
-    )
+
     main_image = models.ImageField(
         upload_to='mediafiles/'
     )
@@ -69,12 +53,9 @@ class Product(models.Model):
         to=Category,
         on_delete=models.CASCADE,
     )
-    product_type = models.ForeignKey(
-        to=ProductType,
-        on_delete=models.CASCADE,
-    )
+
     brand = models.CharField(
-        max_length=100
+        choices=BrandChoice
     )
     created_at = models.DateTimeField(
         auto_now_add=True
@@ -85,13 +66,11 @@ class Product(models.Model):
     is_active = models.BooleanField(
         default=True
     )
+
     class Meta:
         permissions = [
-            ('can_create_products', 'Can create posts')
+            ('can_create_products', 'Can create products')
         ]
-
-    def __str__(self):
-        return self.name
 
     def get_discounted_price(self):
         return self.discount_price if self.discount_price else self.price

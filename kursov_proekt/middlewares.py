@@ -7,5 +7,6 @@ class ContextModification(MiddlewareMixin):
 
         if hasattr(response, 'context_data'):
             response.context_data['user_logged_in'] = request.user.is_authenticated
-
+            permissions = request.user.get_group_permissions()
+            response.context_data['has_perm'] = True if 'product.can_create_products' in permissions else False
         return response

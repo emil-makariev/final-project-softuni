@@ -10,3 +10,8 @@ class HomePage(ListView):
     model = Product
     template_name = 'common/index.html'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        permissions = self.request.user.get_group_permissions()
+        context['has_perm'] = True if 'product.can_create_products' in permissions else False
+        return context
