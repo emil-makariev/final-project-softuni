@@ -22,7 +22,7 @@ class ColorChoice(models.TextChoices):
 
 
 class BrandChoice(models.TextChoices):
-    LOUIS_VUITTON = "Louis Vuitton", "Louis Vuitton"
-    HERMES = "Hermès", "Hermès"
+    LOUIS_VUITTON = "LV", "Louis Vuitton"
+    HERMES = "Hermes", "Hermes"
     GUCCI = "Gucci", "Gucci"
     CHANEL = "Chanel", "Chanel"
