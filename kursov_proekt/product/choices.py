@@ -10,15 +10,15 @@ class SizeChoice(models.TextChoices):
 
 
 class ColorChoice(models.TextChoices):
-    RED = "Red", "Red"
-    BLUE = "Blue", "Blue"
-    YELLOW = "Yellow", "Yellow"
-    BLACK = "Black", "Black"
-    WHITE = "White", "White"
-    PINK = "Pink", "Pink"
-    LIGHT_PURPLE = "Light-Purple", "Light-Purple"
-    GREY = "Grey", "Grey"
-    BROWN = "BROWN", "BROWN"
+    RED = "red", "Red"
+    BLUE = "blue", "Blue"
+    YELLOW = "yellow", "Yellow"
+    BLACK = "black", "Black"
+    WHITE = "white", "White"
+    PINK = "pink", "Pink"
+    LIGHT_PURPLE = "light-purple", "Light-Purple"
+    GREY = "grey", "Grey"
+    BROWN = "brown", "Brown"
 
 
 class BrandChoice(models.TextChoices):

@@ -40,9 +40,9 @@
                                         <div class="card-body">
                                             <div class="shop__sidebar__categories">
                                                 <ul id="product-list" class="nice-scroll">
-                                                    <li class="category-filter check" data-category="clothing"><a href="#">Clothing (20)</a></li>
-                                                    <li class="category-filter check" data-category="shoes"><a href="#">Shoes (20)</a></li>
-                                                    <li class="category-filter check" data-category="accessories"><a href="#">Accessories (20)</a></li>
+                                                    <li class="category-filter" data-category="clothing"><a href="#">Clothing (20)</a></li>
+                                                    <li class="category-filter" data-category="shoes"><a href="#">Shoes (20)</a></li>
+                                                    <li class="category-filter" data-category="accessories"><a href="#">Accessories (20)</a></li>
                                                 </ul>
 
                                             </div>
@@ -57,10 +57,10 @@
                                         <div class="card-body">
                                             <div class="shop__sidebar__brand">
                                                 <ul>
-                                                    <li class="brand-filter check" data-brand="LV"><a href="#">Louis Vuitton</a></li>
-                                                    <li class="brand-filter check" data-brand="Chanel"><a href="#">Chanel</a></li>
-                                                    <li class="brand-filter check" data-brand="Hermes"><a href="#">Hermes</a></li>
-                                                    <li class="brand-filter check" data-brand="Gucci"><a href="#">Gucci</a></li>
+                                                    <li class="brand-filter" data-brand="LV"><a href="#">Louis Vuitton</a></li>
+                                                    <li class="brand-filter" data-brand="Chanel"><a href="#">Chanel</a></li>
+                                                    <li class="brand-filter" data-brand="Hermes"><a href="#">Hermes</a></li>
+                                                    <li class="brand-filter" data-brand="Gucci"><a href="#">Gucci</a></li>
                                                 </ul>
                                             </div>
                                         </div>
@@ -74,12 +74,12 @@
                                         <div class="card-body">
                                             <div class="shop__sidebar__price">
                                                 <ul>
-                                                    <li class="price-filter check" data-price="0-50"><a href="#">$0.00 - $50.00</a></li>
-                                                    <li class="price-filter check" data-price="50-100"><a href="#">$50.00 - $100.00</a></li>
-                                                    <li class="price-filter check" data-price="100-150"><a href="#">$100.00 - $150.00</a></li>
-                                                    <li class="price-filter check" data-price="150-200"><a href="#">$150.00 - $200.00</a></li>
-                                                    <li class="price-filter check" data-price="200-250"><a href="#">$200.00 - $250.00</a></li>
-                                                    <li class="price-filter check" data-price="250-+"><a href="#">250.00+</a></li>
+                                                    <li class="price-filter" data-price="0-50"><a href="#">$0.00 - $50.00</a></li>
+                                                    <li class="price-filter" data-price="50-100"><a href="#">$50.00 - $100.00</a></li>
+                                                    <li class="price-filter" data-price="100-150"><a href="#">$100.00 - $150.00</a></li>
+                                                    <li class="price-filter" data-price="150-200"><a href="#">$150.00 - $200.00</a></li>
+                                                    <li class="price-filter" data-price="200-250"><a href="#">$200.00 - $250.00</a></li>
+                                                    <li class="price-filter" data-price="250-+"><a href="#">250.00+</a></li>
                                                 </ul>
                                             </div>
                                         </div>
@@ -92,29 +92,20 @@
                                     <div id="collapseFour" class="collapse show" data-parent="#accordionExample">
                                         <div class="card-body">
                                             <div class="shop__sidebar__size">
-                                                <label for="xs">xs
-                                                    <input class="size-filter" type="radio" id="xs">
+                                                <label class="size-filter" data-size="XS" for="xs">xs
+                                                    <input type="radio" id="xs">
                                                 </label>
-                                                <label for="sm">s
-                                                    <input class="size-filter" type="radio" id="sm">
+                                                <label class="size-filter" data-size="S" for="sm">s
+                                                    <input type="radio" id="sm">
                                                 </label>
-                                                <label for="md">m
-                                                    <input class="size-filter" type="radio" id="md">
+                                                <label class="size-filter" data-size="M" for="md">m
+                                                    <input type="radio" id="md">
                                                 </label>
-                                                <label for="xl">xl
-                                                    <input class="size-filter" type="radio" id="xl">
+                                                <label class="size-filter" data-size="L" for="xl">l
+                                                    <input type="radio" id="xl">
                                                 </label>
-                                                <label for="2xl">2xl
-                                                    <input class="size-filter" type="radio" id="2xl">
-                                                </label>
-                                                <label for="xxl">xxl
-                                                    <input class="size-filter" type="radio" id="xxl">
-                                                </label>
-                                                <label for="3xl">3xl
-                                                    <input class="size-filter" type="radio" id="3xl">
-                                                </label>
-                                                <label for="4xl">4xl
-                                                    <input class="size-filter" type="radio" id="4xl">
+                                                <label class="size-filter" data-size="XL" for="2xl">xl
+                                                    <input type="radio" id="2xl">
                                                 </label>
                                             </div>
                                         </div>
@@ -127,31 +118,31 @@
                                     <div id="collapseFive" class="collapse show" data-parent="#accordionExample">
                                         <div class="card-body">
                                             <div class="shop__sidebar__color">
-                                                <label class="c-1" for="sp-1">
+                                                <label class="c-1 color-filter" data-color="black" for="sp-1">
                                                     <input type="radio" id="sp-1">
                                                 </label>
-                                                <label class="c-2" for="sp-2">
+                                                <label class="c-2 color-filter" data-color="blue" for="sp-2">
                                                     <input type="radio" id="sp-2">
                                                 </label>
-                                                <label class="c-3" for="sp-3">
+                                                <label class="c-3 color-filter" data-color="yellow" for="sp-3">
                                                     <input type="radio" id="sp-3">
                                                 </label>
-                                                <label class="c-4" for="sp-4">
+                                                <label class="c-4 color-filter" data-color="grey" for="sp-4">
                                                     <input type="radio" id="sp-4">
                                                 </label>
-                                                <label class="c-5" for="sp-5">
+                                                <label class="c-5 color-filter" data-color="brown" for="sp-5">
                                                     <input type="radio" id="sp-5">
                                                 </label>
-                                                <label class="c-6" for="sp-6">
+                                                <label class="c-6 color-filter" data-color="pink" for="sp-6">
                                                     <input type="radio" id="sp-6">
                                                 </label>
-                                                <label class="c-7" for="sp-7">
+                                                <label class="c-7 color-filter" data-color="light-purple" for="sp-7">
                                                     <input type="radio" id="sp-7">
                                                 </label>
-                                                <label class="c-8" for="sp-8">
+                                                <label class="c-8 color-filter" data-color="red" for="sp-8">
                                                     <input type="radio" id="sp-8">
                                                 </label>
-                                                <label class="c-9" for="sp-9">
+                                                <label class="c-9 color-filter" data-color="white" for="sp-9">
                                                     <input type="radio" id="sp-9">
                                                 </label>
                                             </div>
@@ -185,7 +176,17 @@
                         <div class="row">
                             <div class="col-lg-6 col-md-6 col-sm-6">
                                 <div class="shop__product__option__left">
-                                    <p>Showing 1–12 of 126 results</p>
+                                    {% if object_list|length < 12 %}
+                                        {% if object_list|length == 1 %}
+                                            <p>Showing 1 of {{ object_list|length }} results</p>
+                                        {% elif object_list|length == 0 %}
+                                            <p>No results</p>
+                                        {% else %}
+                                            <p>Showing 1-{{ object_list|length }} of {{ object_list|length }} results</p>
+                                        {% endif %}
+                                    {% else %}
+                                        <p>Showing 1-12 of {{ object_list|length }} results</p>
+                                    {% endif %}
                                 </div>
                             </div>
                             <div class="col-lg-6 col-md-6 col-sm-6">
@@ -285,12 +286,14 @@
     <script>
 
             $(document).ready(function(){
-                $(".category-filter, .brand-filter, .price-filter").click(function(e){
+                $(".category-filter, .brand-filter, .price-filter, .size-filter, .color-filter").click(function(e){
                     e.preventDefault();
 
                     var category = $(this).data('category');
                     var brand = $(this).data('brand');
                     var price = $(this).data('price');
+                    var size = $(this).data('size');
+                    var color = $(this).data('color');
 
                     if(category){
                         if ($(this).hasClass('active')) {
@@ -316,25 +319,97 @@
                         $('.price-filter').removeClass('active btn-secondary');
                         $(this).addClass('active btn-secondary');
                     }
-                    }
-                    if ()
+                    }else if(size){
+                            var radioButton = $('#' + $(this).attr('for'));
 
-                    filterProducts(category, brand, price);
+                            if (radioButton.prop('checked')) {
+                                radioButton.prop('checked', false);
+                                $(this).removeClass('active btn-secondary');
+                                size=''
+                            } else {
+                                radioButton.prop('checked', true);
+                                $(this).addClass('active btn-secondary');
+
+                                $('.size-filter').not(this).removeClass('active btn-secondary');
+
+                                $('.size-filter').not(this).each(function() {
+                                    var otherRadioButton = $('#' + $(this).attr('for'));
+                                    otherRadioButton.prop('checked', false);
+                                });
+                            }
+                    }else if(color){
+                        var radioButton = $('#' + $(this).attr('for'));
+
+                        if (radioButton.prop('checked')) {
+                            radioButton.prop('checked', false);
+                            $(this).removeClass('selected');
+                            color=''
+                        } else {
+
+                            $(this).addClass('selected');
+                            radioButton.prop('checked', true);
+                        }
+
+
+                        $('.color-filter').not(this).removeClass('selected');
+
+                        $('.color-filter').not(this).each(function() {
+                            var otherRadioButton = $('#' + $(this).attr('for'));
+                            otherRadioButton.prop('checked', false);
+                        });
+
+
+                        e.stopImmediatePropagation();
+
+                    }
+                    var elements = $(".active.btn-secondary, .selected")
+                    if (elements) {
+                        elements.each(function() {
+                            var el = $(this);
+
+                            if(el.data('category')){
+                                category = el.data('category')
+                            }else if(el.data('brand')){
+                                brand = el.data('brand')
+                            }else if(el.data('price')) {
+                                price = el.data('price')
+                            }else if(el.data('size')) {
+                                size = el.data('size')
+                            }else if(el.data('color')) {
+                                color = el.data('color')
+                            }
+                        });
+                    }
+
+                    filterProducts(category, brand, price, size, color);
                 });
 
-                function filterProducts(category, brand, price) {
+                function filterProducts(category, brand, price, size, color) {
             $.ajax({
-                url: "{% url 'all-products' %}",  // URL to fetch the filtered products (Django URL tag)
-                data: { 'category': category, 'brand': brand, 'price': price },  // Send category parameter to server
-                dataType: 'json',  // Expect JSON response from the server
+                url: "{% url 'all-products' %}",
+                data: { 'category': category, 'brand': brand, 'price': price, 'size': size, 'color': color },
+                dataType: 'json',
                 success: function(response) {
-                    $('#filtered-products').empty();  // Clear the existing product list
+                    $('#filtered-products').empty();
 
-                    // Check if response.products exists and is an array
                     if (response.products && Array.isArray(response.products)) {
-                        // Loop through each product in the response
+                         var productsLength = response.products.length;
+
+                            var productCountMessage = '';
+                            if (productsLength === 0) {
+                                productCountMessage = `No results`;
+                            } else if (productsLength === 1) {
+                                productCountMessage = `Showing 1 of ${productsLength} result`;
+                            } else if (productsLength < 12) {
+                                productCountMessage = `Showing 1-${productsLength} of ${productsLength} results`;
+                            } else {
+                                productCountMessage = `Showing 1-12 of ${productsLength} results`;
+                            }
+
+                            // Update the product count message dynamically (client-side)
+                            $('.shop__product__option__left').html(`<p>${productCountMessage}</p>`);
+
                         response.products.forEach(function(product) {
-                            // Create the HTML structure for each product using JavaScript template literals
                             var productHTML = `
                                 <div class="col-lg-4 col-md-6 col-sm-6">
                                     <div class="product__item product-list" data-category="${product.category}">
@@ -355,7 +430,7 @@
                                                 <i class="fa fa-star-o"></i>
                                                 <i class="fa fa-star-o"></i>
                                                 <i class="fa fa-star-o"></i>
-                                                <script src="{% static 'js/stars-logic.js' %}">
+
                                             </div>
                                             <h5>${product.price}</h5>  <!-- Use template literals to insert product price -->
                                             <div class="product__color__select">
@@ -368,7 +443,6 @@
                                 </div>
                             `;
 
-                            // Append the generated HTML for this product to the #filtered-products container
                             $('#filtered-products').append(productHTML);
                         });
                     } else {
@@ -376,7 +450,6 @@
                     }
                 },
                 error: function(xhr, status, error) {
-                    // Handle any errors that occur during the AJAX request
                     console.error("Error fetching products: " + error);
                 }
             });

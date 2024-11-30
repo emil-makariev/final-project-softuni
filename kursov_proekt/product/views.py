@@ -27,13 +27,11 @@ class DashboardProducts(ListView):
         category_name = self.request.GET.get('category')
         brand_name = self.request.GET.get('brand')
         price_name = self.request.GET.get('price')
+        size = self.request.GET.get('size')
+        color = self.request.GET.get('color')
 
         if category_name:
             try:
-                if brand_name == queryset[0].brand:
-                    print('YAAAS')
-                else:
-                    print('adadada')
                 queryset = queryset.filter(category__name=category_name)
             except Category.DoesNotExist:
                 queryset = queryset.none()
@@ -41,6 +39,38 @@ class DashboardProducts(ListView):
         if brand_name:
             try:
                 queryset = queryset.filter(brand=brand_name)
+            except Exception as e:
+                print(f"Error occurred: {e}")
+
+        if price_name:
+            try:
+                min_max_price = price_name.split('-')
+                min_price = int(min_max_price[0])
+
+                try:
+                    max_price = int(min_max_price[1])
+                except IndexError:
+                    max_price = None
+                except ValueError:
+                    max_price = None
+
+                if max_price is not None:
+                    queryset = queryset.filter(price__gte=min_price, price__lt=max_price)
+                else:
+                    queryset = queryset.filter(price__gte=min_price)
+
+            except Exception as e:
+                print(f"Error occurred: {e}")
+
+        if size:
+            try:
+                queryset = queryset.filter(size=size)
+            except Exception as e:
+                print(f"Error occurred: {e}")
+
+        if color:
+            try:
+                queryset = queryset.filter(color=color)
             except Exception as e:
                 print(f"Error occurred: {e}")
 
