@@ -1,156 +1,350 @@
 {% extends 'base.html' %}
-
+{% load static %}
 {% block content %}
-
-    <!-- Breadcrumb Section Begin -->
-    <section class="breadcrumb-option">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="breadcrumb__text">
-                        <h4>Shopping Cart</h4>
-                        <div class="breadcrumb__links">
-                            <a href="../common/index.html">Home</a>
-                            <a href="../common/shop.html">Shop</a>
-                            <span>Shopping Cart</span>
-                        </div>
+    <style>
+        .hidden {
+            display: none;
+        }
+    </style>
+<!-- Breadcrumb Section Begin -->
+<section class="breadcrumb-option">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="breadcrumb__text">
+                    <h4>Shopping Cart</h4>
+                    <div class="breadcrumb__links">
+                        <a href="../common/index.html">Home</a>
+                        <a href="../common/shop.html">Shop</a>
+                        <span>Shopping Cart</span>
                     </div>
                 </div>
             </div>
         </div>
-    </section>
-    <!-- Breadcrumb Section End -->
+    </div>
+</section>
+<!-- Breadcrumb Section End -->
 
-    <!-- Shopping Cart Section Begin -->
-    <section class="shopping-cart spad">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-8">
-                    <div class="shopping__cart__table">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Product</th>
-                                    <th>Quantity</th>
-                                    <th>Total</th>
-                                    <th></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td class="product__cart__item">
-                                        <div class="product__cart__item__pic">
-                                            <img src="img/shopping-cart/cart-1.jpg" alt="">
+<!-- Shopping Cart Section Begin -->
+<section class="shopping-cart spad">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="shopping__cart__table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Quantity</th>
+                                <th>Total</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in product_data %}
+                            <tr>
+                                <td class="product__cart__item">
+                                    <div class="product__cart__item__pic">
+                                        <img src="{{ item.product.main_image.url }}" alt="">
+                                    </div>
+                                    <div class="product__cart__item__text">
+                                        <h6>{{ item.product.name }}</h6>
+                                        <!-- Display product size -->
+                                        Product size is: <h6>{{ item.size_text }}</h6>
+                                        <h5 class="product-price">${{ item.product.price }}</h5>
+                                    </div>
+                                </td>
+                                <td class="quantity__item">
+                                    <div class="quantity">
+                                        <div class="pro-qty-2">
+                                            <!-- Decrease button -->
+                                            <span class="fa fa-angle-left dec qtybtn"
+                                                  data-id="{{ item.product.id }}"
+                                                  data-size="{{ item.size.id }}"
+                                                  data-max-quantity="{{ item.max_quantity }}"></span>
+
+                                            <!-- Quantity input field -->
+                                            <input type="text"
+                                                   value="{{ item.count }}"
+                                                   class="quantity-input"
+                                                   data-price="{{ item.product.price }}"
+                                                   data-id="{{ item.product.id }}"
+                                                   data-size="{{ item.size.id }}"
+                                                   data-max-quantity="{{ item.max_quantity }}"
+                                                   readonly>
+
+                                            <!-- Increase button -->
+                                            <span class="fa fa-angle-right inc qtybtn"
+                                                  data-id="{{ item.product.id }}"
+                                                  data-size="{{ item.size.id }}"
+                                                  data-max-quantity="{{ item.max_quantity }}"></span>
                                         </div>
-                                        <div class="product__cart__item__text">
-                                            <h6>T-shirt Contrast Pocket</h6>
-                                            <h5>$98.49</h5>
-                                        </div>
-                                    </td>
-                                    <td class="quantity__item">
-                                        <div class="quantity">
-                                            <div class="pro-qty-2">
-                                                <input type="text" value="1">
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="cart__price">$ 30.00</td>
-                                    <td class="cart__close"><i class="fa fa-close"></i></td>
-                                </tr>
-                                <tr>
-                                    <td class="product__cart__item">
-                                        <div class="product__cart__item__pic">
-                                            <img src="img/shopping-cart/cart-2.jpg" alt="">
-                                        </div>
-                                        <div class="product__cart__item__text">
-                                            <h6>Diagonal Textured Cap</h6>
-                                            <h5>$98.49</h5>
-                                        </div>
-                                    </td>
-                                    <td class="quantity__item">
-                                        <div class="quantity">
-                                            <div class="pro-qty-2">
-                                                <input type="text" value="1">
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="cart__price">$ 32.50</td>
-                                    <td class="cart__close"><i class="fa fa-close"></i></td>
-                                </tr>
-                                <tr>
-                                    <td class="product__cart__item">
-                                        <div class="product__cart__item__pic">
-                                            <img src="img/shopping-cart/cart-3.jpg" alt="">
-                                        </div>
-                                        <div class="product__cart__item__text">
-                                            <h6>Basic Flowing Scarf</h6>
-                                            <h5>$98.49</h5>
-                                        </div>
-                                    </td>
-                                    <td class="quantity__item">
-                                        <div class="quantity">
-                                            <div class="pro-qty-2">
-                                                <input type="text" value="1">
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="cart__price">$ 47.00</td>
-                                    <td class="cart__close"><i class="fa fa-close"></i></td>
-                                </tr>
-                                <tr>
-                                    <td class="product__cart__item">
-                                        <div class="product__cart__item__pic">
-                                            <img src="img/shopping-cart/cart-4.jpg" alt="">
-                                        </div>
-                                        <div class="product__cart__item__text">
-                                            <h6>Basic Flowing Scarf</h6>
-                                            <h5>$98.49</h5>
-                                        </div>
-                                    </td>
-                                    <td class="quantity__item">
-                                        <div class="quantity">
-                                            <div class="pro-qty-2">
-                                                <input type="text" value="1">
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="cart__price">$ 30.00</td>
-                                    <td class="cart__close"><i class="fa fa-close"></i></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="row">
-                        <div class="col-lg-6 col-md-6 col-sm-6">
-                            <div class="continue__btn">
-                                <a href="#">Continue Shopping</a>
-                            </div>
-                        </div>
-                        <div class="col-lg-6 col-md-6 col-sm-6">
-                            <div class="continue__btn update__btn">
-                                <a href="#"><i class="fa fa-spinner"></i> Update cart</a>
-                            </div>
-                        </div>
-                    </div>
+                                    </div>
+                                </td>
+                                <td class="cart__price">
+                                    <span class="total-price" id="total-price-{{ item.product.id }}-{{ item.size.id }}">${{ item.total_price|floatformat:2 }}</span>
+                                </td>
+                                <td class="cart__close"><i class="fa fa-close"></i></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
-                <div class="col-lg-4">
-                    <div class="cart__discount">
-                        <h6>Discount codes</h6>
-                        <form action="#">
-                            <input type="text" placeholder="Coupon code">
-                            <button type="submit">Apply</button>
-                        </form>
+                <div class="row">
+                    <div class="col-lg-6 col-md-6 col-sm-6">
+                        <div class="continue__btn">
+                            <a href="#">Continue Shopping</a>
+                        </div>
                     </div>
-                    <div class="cart__total">
-                        <h6>Cart total</h6>
-                        <ul>
-                            <li>Subtotal <span>$ 169.50</span></li>
-                            <li>Total <span>$ 169.50</span></li>
-                        </ul>
-                        <a href="#" class="primary-btn">Proceed to checkout</a>
+                    <div class="col-lg-6 col-md-6 col-sm-6">
+                        <div class="continue__btn update__btn">
+                            <a href="#"><i class="fa fa-spinner"></i> Update cart</a>
+                        </div>
                     </div>
                 </div>
             </div>
+            <div class="col-lg-4">
+                <div class="cart__discount">
+                    <h6>Discount codes</h6>
+                    <form action="#">
+                        <input type="text" placeholder="Coupon code">
+                        <button type="submit">Apply</button>
+                    </form>
+                </div>
+                <div class="cart__total">
+                    <h6>Cart total</h6>
+                    <ul>
+                        <li>Subtotal <span>$ 169.50</span></li>
+                        <li>Total <span>$ 169.50</span></li>
+                    </ul>
+                    <a href="#" class="primary-btn">Proceed to checkout</a>
+                </div>
+            </div>
         </div>
-    </section>
+    </div>
+</section>
+<!-- Shopping Cart Section End -->
+
+       <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const userId = {{ user_id }};  // Вземаме user_id от контекста
+
+            // Обработваме бутоните за увеличаване и намаляване на количеството
+            const allArrows = document.querySelectorAll('.fa-angle-left, .fa-angle-right');
+
+            allArrows.forEach(function (arrow) {
+                if (!arrow.hasAttribute('data-id') || !arrow.hasAttribute('data-size')) {
+                    arrow.remove(); // премахваме елементите без data-id или data-size атрибути
+                }
+            });
+
+            const quantityInputs = document.querySelectorAll('.quantity-input');
+                quantityInputs.forEach(inputElement => {
+                const dataId = inputElement.getAttribute('data-id');
+                const dataSize = inputElement.getAttribute('data-size');
+                const maxQuantity = parseInt(inputElement.getAttribute('data-max-quantity'));
+
+
+                const decreaseButton = document.querySelector(`.fa-angle-left.dec[data-id='${dataId}'][data-size='${dataSize}']`);
+                const increaseButton = document.querySelector(`.fa-angle-right.inc[data-id='${dataId}'][data-size='${dataSize}']`);
+
+
+                let currentQuantity = parseInt(inputElement.value);
+                console.log('Max quantity:', maxQuantity)
+                console.log('Current quantity:', currentQuantity);
+
+
+                // Ако количеството е 1 или по-малко, скриваме бутона за намаляване
+                if (currentQuantity <= 1) {
+                    decreaseButton.classList.add('hidden');// Скриваме стрелката за намаляване
+                }else if(currentQuantity === maxQuantity){
+                    increaseButton.classList.add('hidden')
+                }
+            });
+
+            const increaseButtons = document.querySelectorAll('.fa-angle-right.inc');
+            increaseButtons.forEach(button => {
+                button.addEventListener('click', function () {
+                    const inputElement = document.querySelector(`input[data-id='${button.getAttribute('data-id')}'][data-size='${button.getAttribute('data-size')}']`);
+                    const price = parseFloat(inputElement.getAttribute('data-price'));
+                    const dataId = button.getAttribute('data-id');
+                    const descButtonB = document.querySelector(`.fa-angle-left.dec[data-id='${dataId}']`);
+                    descButtonB.classList.remove('hidden')
+
+
+                    let maxQuantity = parseInt(inputElement.getAttribute('data-max-quantity'));
+                    maxQuantity -= 1;
+
+                    let currentQuantity = parseInt(inputElement.value);
+                    currentQuantity -= 1;
+
+                    console.log(currentQuantity)
+                    console.log(maxQuantity)
+
+                    if(currentQuantity + 1 === maxQuantity){
+                        console.log('dadad')
+                        button.classList.add('hidden')
+                    }
+                    if (currentQuantity < maxQuantity) {
+                        currentQuantity += 1;
+                        inputElement.value = currentQuantity;
+
+                        updatePrice(inputElement, price);
+
+                        // Добавяне на продукт към количката чрез AJAX
+                        const productId = button.getAttribute('data-id');
+                        const sizeId = button.getAttribute('data-size');
+                        addItemToOrder(productId, sizeId);
+
+                        // Актуализиране на общата сума на количката
+                        updateCartTotal();
+                    } else {
+                        alert("Не можете да поръчате повече от наличното количество за този размер.");
+                        button.disabled = true; // Disable the increase button if max quantity is reached
+                        button.classList.add('hidden');
+
+                    }
+                });
+            });
+
+            const decreaseButtons = document.querySelectorAll('.fa-angle-left.dec');
+            decreaseButtons.forEach(button => {
+                button.addEventListener('click', function () {
+                    const inputElement = document.querySelector(`input[data-id='${button.getAttribute('data-id')}'][data-size='${button.getAttribute('data-size')}']`);
+                    const price = parseFloat(inputElement.getAttribute('data-price'));
+                    const maxQuantity = parseInt(inputElement.getAttribute('data-max-quantity'));
+                    const dataId = button.getAttribute('data-id');
+                    const increaseButtonB = document.querySelector(`.fa-angle-right.inc[data-id='${dataId}']`);
+
+                         // Премахваме класа hidden от десния бутон, ако съществува
+                        increaseButtonB.classList.remove('hidden');
+
+                        let currentQuantity = parseInt(inputElement.value);
+                        currentQuantity += 1
+
+                        if (currentQuantity + 1 > maxQuantity) {
+                                currentQuantity = maxQuantity - 1;
+                                updatePriceDec(inputElement, price)}
+
+                        else if (currentQuantity > 1) {
+                            currentQuantity -= 1;
+                            inputElement.value = currentQuantity;
+                            updatePriceDec(inputElement, price);
+
+                            // Ако количеството е 1, скриваме бутона за намаляване
+                            if (currentQuantity - 1 <= 1) {
+                                currentQuantity = 1
+                                button.classList.add('hidden');
+                            }
+                        } else {
+                            alert("Не можете да намалите количеството под 1.");
+                            button.disabled = true;  // Деактивираме бутона
+                            button.classList.add('hidden');  // Скриваме бутона
+                        }
+
+                                if (currentQuantity < maxQuantity) {
+                                increaseButtonB.disabled = false;
+                                increaseButtonB.classList.remove('hidden');
+                            } else {
+                                increaseButtonB.disabled = true;
+                            }
+
+                    // Премахване на продукт от количката чрез AJAX
+                    const productId = button.getAttribute('data-id');
+                    const sizeId = button.getAttribute('data-size');
+                    removeItemFromOrder(productId, sizeId);
+
+                    // Актуализиране на общата сума на количката
+                    updateCartTotal();
+                });
+            });
+
+            function updatePrice(inputElement, price) {
+                var quantity = parseInt(inputElement.value);
+                quantity += 1;
+                console.log(quantity)
+                const totalPrice = quantity * price;
+                console.log(totalPrice)
+                const totalPriceElement = document.getElementById('total-price-' + inputElement.getAttribute('data-id') + '-' + inputElement.getAttribute('data-size'));
+                totalPriceElement.textContent = `$${totalPrice.toFixed(2)}`;
+            }
+
+            function updatePriceDec(inputElement, price) {
+                var quantity = parseInt(inputElement.value);
+                quantity -= 1;
+                const totalPrice = quantity * price;
+                const totalPriceElement = document.getElementById('total-price-' + inputElement.getAttribute('data-id') + '-' + inputElement.getAttribute('data-size'));
+                totalPriceElement.textContent = `$${totalPrice.toFixed(2)}`;
+            }
+
+            // Функция за добавяне на продукт в OrderItems чрез AJAX
+            function addItemToOrder(productId, sizeId) {
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+            fetch('/carts/add-to-order/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
+                body: JSON.stringify({
+                    product_id: productId,
+                    size_id: sizeId
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Item added to order:', data);
+            })
+            .catch(error => {
+                console.error('Error adding item to order:', error);
+            });
+        }
+
+            // Функция за премахване на продукт от OrderItems чрез AJAX
+            function removeItemFromOrder(productId, sizeId) {
+                const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+                fetch(`/carts/remove-from-order/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken
+                    },
+                    body: JSON.stringify({
+                        product_id: productId,
+                        size_id: sizeId,
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Item removed from order:', data);
+                })
+                .catch(error => {
+                    console.error('Error removing item from order:', error);
+                });
+            }
+
+            // Функция за актуализиране на общата стойност на количката
+            function updateCartTotal() {
+                fetch(`/carts/${userId}/update-cart-total/`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        const totalPriceElement = document.getElementById('cart-total-price');
+                        totalPriceElement.textContent = `$${data.total_price.toFixed(2)}`;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error updating cart total:', error);
+                });
+            }
+        });
+    </script>
+
 {% endblock %}

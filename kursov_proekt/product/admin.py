@@ -12,15 +12,15 @@ class CategoryAdmin(admin.ModelAdmin):
 
 
 # Registering Product model using the @admin.register decorator
-@admin.register(Product)
+
 class ProductAdmin(admin.ModelAdmin):
     list_display = (
-        'name', 'category', 'price', 'stock_quantity', 'sku', 'brand', 'created_at', 'is_active'
+        'name', 'category', 'price', 'sku', 'brand', 'created_at', 'is_active', 'get_max_stock_quantity'
     )
     list_filter = ('category', 'is_active', 'created_at')
     search_fields = ('name', 'sku', 'brand')
     ordering = ('-created_at',)  # Default ordering by created_at (most recent first)
-    list_editable = ('price', 'stock_quantity', 'is_active')  # Allow inline editing of specific fields
+    list_editable = ('price', 'is_active')  # Allow inline editing of specific fields
 
     # Optional: Adding a custom field to display discounted price
     def get_discounted_price(self, obj):
@@ -32,3 +32,11 @@ class ProductAdmin(admin.ModelAdmin):
         if not obj.main_image:
             obj.main_image = 'default_image.jpg'  # Set default image if not uploaded
         super().save_model(request, obj, form, change)
+
+    # Display the maximum quantity in the admin interface
+    def get_max_stock_quantity(self, obj):
+        return obj.get_max_stock_quantity()
+    get_max_stock_quantity.short_description = 'Max Stock Quantity'
+
+# Register the Product model with the customized admin interface
+admin.site.register(Product, ProductAdmin)

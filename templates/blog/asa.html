@@ -1,0 +1,494 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+    <section class="breadcrumb-option">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="breadcrumb__text">
+                        <h4>Shop</h4>
+                        <div class="breadcrumb__links">
+                            <a href="index.html">Home</a>
+                            <span>Shop</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Breadcrumb Section End -->
+
+    <!-- Shop Section Begin -->
+    <section class="shop spad">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-3">
+                    <div class="shop__sidebar">
+                        <div class="shop__sidebar__search">
+                            <form action="#" method="get">
+
+                                {{ form }}
+                                <button type="submit"><span class="icon_search"></span></button>
+                            </form>
+                            {% if search_result %}
+                                <p>Results for: "{{ search_result }}"</p>
+                            {% endif %}
+                        </div>
+                        <div class="shop__sidebar__accordion">
+                            <div class="accordion" id="accordionExample">
+                                <div class="card">
+                                    <div class="card-heading">
+                                        <a data-toggle="collapse" data-target="#collapseOne">Categories</a>
+                                    </div>
+                                    <div id="collapseOne" class="collapse show" data-parent="#accordionExample">
+                                        <div class="card-body">
+                                            <div class="shop__sidebar__categories">
+                                                <ul id="product-list" class="nice-scroll">
+                                                    <li class="category-filter" data-category="clothing"><a href="#">Clothing ({{ total_clothing }})</a></li>
+                                                    <li class="category-filter" data-category="shoes"><a href="#">Shoes ({{ total_shoes }})</a></li>
+                                                    <li class="category-filter" data-category="accessories"><a href="#">Accessories ({{ total_accessories }})</a></li>
+                                                </ul>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card">
+                                    <div class="card-heading">
+                                        <a data-toggle="collapse" data-target="#collapseTwo">Branding</a>
+                                    </div>
+                                    <div id="collapseTwo" class="collapse show" data-parent="#accordionExample">
+                                        <div class="card-body">
+                                            <div class="shop__sidebar__brand">
+                                                <ul>
+                                                    <li class="brand-filter" data-brand="LV"><a href="#">Louis Vuitton</a></li>
+                                                    <li class="brand-filter" data-brand="Chanel"><a href="#">Chanel</a></li>
+                                                    <li class="brand-filter" data-brand="Hermes"><a href="#">Hermes</a></li>
+                                                    <li class="brand-filter" data-brand="Gucci"><a href="#">Gucci</a></li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card">
+                                    <div class="card-heading">
+                                        <a data-toggle="collapse" data-target="#collapseThree">Filter Price</a>
+                                    </div>
+                                    <div id="collapseThree" class="collapse show" data-parent="#accordionExample">
+                                        <div class="card-body">
+                                            <div class="shop__sidebar__price">
+                                                <ul>
+                                                    <li class="price-filter" data-price="0-50"><a href="#">$0.00 - $50.00</a></li>
+                                                    <li class="price-filter" data-price="50-100"><a href="#">$50.00 - $100.00</a></li>
+                                                    <li class="price-filter" data-price="100-150"><a href="#">$100.00 - $150.00</a></li>
+                                                    <li class="price-filter" data-price="150-200"><a href="#">$150.00 - $200.00</a></li>
+                                                    <li class="price-filter" data-price="200-250"><a href="#">$200.00 - $250.00</a></li>
+                                                    <li class="price-filter" data-price="250-+"><a href="#">250.00+</a></li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card">
+                                    <div class="card-heading">
+                                        <a data-toggle="collapse" data-target="#collapseFour">Size</a>
+                                    </div>
+                                    <div id="collapseFour" class="collapse show" data-parent="#accordionExample">
+                                        <div class="card-body">
+                                            <div class="shop__sidebar__size">
+                                                <label class="size-filter" data-size="XS" for="xs">xs
+                                                    <input type="radio" id="xs">
+                                                </label>
+                                                <label class="size-filter" data-size="S" for="sm">s
+                                                    <input type="radio" id="sm">
+                                                </label>
+                                                <label class="size-filter" data-size="M" for="md">m
+                                                    <input type="radio" id="md">
+                                                </label>
+                                                <label class="size-filter" data-size="L" for="xl">l
+                                                    <input type="radio" id="xl">
+                                                </label>
+                                                <label class="size-filter" data-size="XL" for="2xl">xl
+                                                    <input type="radio" id="2xl">
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card">
+                                    <div class="card-heading">
+                                        <a data-toggle="collapse" data-target="#collapseFive">Colors</a>
+                                    </div>
+                                    <div id="collapseFive" class="collapse show" data-parent="#accordionExample">
+                                        <div class="card-body">
+                                            <div class="shop__sidebar__color">
+                                                <label class="c-1 color-filter" data-color="black" for="sp-1">
+                                                    <input type="radio" id="sp-1">
+                                                </label>
+                                                <label class="c-2 color-filter" data-color="blue" for="sp-2">
+                                                    <input type="radio" id="sp-2">
+                                                </label>
+                                                <label class="c-3 color-filter" data-color="yellow" for="sp-3">
+                                                    <input type="radio" id="sp-3">
+                                                </label>
+                                                <label class="c-4 color-filter" data-color="grey" for="sp-4">
+                                                    <input type="radio" id="sp-4">
+                                                </label>
+                                                <label class="c-5 color-filter" data-color="brown" for="sp-5">
+                                                    <input type="radio" id="sp-5">
+                                                </label>
+                                                <label class="c-6 color-filter" data-color="pink" for="sp-6">
+                                                    <input type="radio" id="sp-6">
+                                                </label>
+                                                <label class="c-7 color-filter" data-color="light-purple" for="sp-7">
+                                                    <input type="radio" id="sp-7">
+                                                </label>
+                                                <label class="c-8 color-filter" data-color="red" for="sp-8">
+                                                    <input type="radio" id="sp-8">
+                                                </label>
+                                                <label class="c-9 color-filter" data-color="white" for="sp-9">
+                                                    <input type="radio" id="sp-9">
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card">
+                                    <div class="card-heading">
+                                        <a data-toggle="collapse" data-target="#collapseSix">Tags</a>
+                                    </div>
+                                    <div id="collapseSix" class="collapse show" data-parent="#accordionExample">
+                                        <div class="card-body">
+                                            <div class="shop__sidebar__tags">
+                                                <a href="#">Product</a>
+                                                <a href="#">Bags</a>
+                                                <a href="#">Shoes</a>
+                                                <a href="#">Fashio</a>
+                                                <a href="#">Clothing</a>
+                                                <a href="#">Hats</a>
+                                                <a href="#">Accessories</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-9">
+                    <div class="shop__product__option">
+                        <div class="row">
+                            <div class="col-lg-6 col-md-6 col-sm-6">
+                                <div class="shop__product__option__left">
+                                    {% if object_list|length < 12 %}
+                                        {% if object_list|length == 1 %}
+                                            <p>Showing 1 of {{ object_list|length }} results</p>
+                                        {% elif object_list|length == 0 %}
+                                            <p>No results</p>
+                                        {% else %}
+                                            <p>Showing 1-{{ object_list|length }} of {{ object_list|length }} results</p>
+                                        {% endif %}
+                                    {% else %}
+                                        <p>Showing 1-12 of {{ object_list|length }} results</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-md-6 col-sm-6">
+                                <div class="shop__product__option__right">
+                                    <p>Sort by Price:</p>
+                                    <select>
+                                        <option class="price-sort" data-value="LtH">None</option>
+                                        <option class="price-sort" data-value="LtH">Low To High</option>
+                                        <option class="price-sort" data-value="HtL">High To Low</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" id="filtered-products">
+                        {% for product in object_list %}
+                            <div class="col-lg-4 col-md-6 col-sm-6">
+                                <div class="product__item product-list">
+                                        <div class="product__item__pic set-bg" data-setbg="{{ product.main_image.url }}">
+                                            <img src="{{ product.main_image.url }}" alt="{{ product.name }}">
+
+                                            <ul class="product__hover">
+                                                <li><a href="#"><img src="{% static 'img/icon/heart.png' %}" alt=""></a></li>
+                                                <li><a href="#"><img src="{% static 'img/icon/compare.png' %}" alt=""> <span>Compare</span></a>
+                                                </li>
+                                            <li><a href="#"><img src="{% static 'img/icon/search.png'%}" alt=""></a></li>
+                                        </ul>
+                                    </div>
+                                    <div class="product__item__text">
+                                        <h6>{{ product.name }}</h6>
+                                        <a href="#" class="add-cart">+ Add To Cart</a>
+                                        <div class="rating">
+                                            <i class="fa fa-star-o"></i>
+                                            <i class="fa fa-star-o"></i>
+                                            <i class="fa fa-star-o"></i>
+                                            <i class="fa fa-star-o"></i>
+                                            <i class="fa fa-star-o"></i>
+                                            <script src="{% static 'js/stars-logic.js' %}"></script>
+                                        </div>
+                                        <h5>{{ product.price }}</h5>
+                                        <div class="product__color__select">
+                                            <label for="pc-4">
+                                                <input type="radio" id="pc-4">
+                                            </label>
+                                            <label class="active black" for="pc-5">
+                                                <input type="radio" id="pc-5">
+                                            </label>
+                                            <label class="grey" for="pc-6">
+                                                <input type="radio" id="pc-6">
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="product__pagination">
+                                {% if not page_obj.has_next and page_obj.number == 1 %}
+                                    <p>That's the only page</p>
+                                {% else %}
+                                    <div class="pagination">
+                                        <span class="step-links">
+                                            <!-- First and Previous page links -->
+
+                                            <!-- Show Page Numbers with Ellipsis if necessary -->
+                                            {% for num in page_obj.paginator.page_range %}
+                                                {% if num == page_obj.number %}
+                                                    <a class="active" href="#">{{ num }}</a>  <!-- Active current page -->
+                                                {% elif num >= page_obj.number|add:'-3' and num <= page_obj.number|add:'3' %}
+                                                    <a href="?page={{ num }}">{{ num }}</a>  <!-- Nearby pages (within +-3) -->
+                                                {% elif num == 1 or num == page_obj.paginator.num_pages %}
+                                                    <a href="?page={{ num }}">{{ num }}</a>  <!-- First and last page links -->
+                                                {% elif num == page_obj.number|add:'-4' %}
+                                                    <span>...</span>  <!-- Ellipsis before current page -->
+                                                {% elif num == page_obj.number|add:'3' %}
+                                                    <span>...</span>
+                                                {% endif %}
+                                            {% endfor %}
+
+                                            <!-- Next and Last page links -->
+                                        </span>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Shop Section End -->
+
+    <!-- Footer Section Begin -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+
+        $(document).ready(function(){
+            $(".category-filter, .brand-filter, .price-filter, .size-filter, .color-filter, .price-sort").click(function(e){
+                e.preventDefault();
+
+                var category = $(this).data('category');
+                var brand = $(this).data('brand');
+                var price = $(this).data('price');
+                var size = $(this).data('size');
+                var color = $(this).data('color');
+
+                var sort_price = '';
+
+                if(category){
+                    if ($(this).hasClass('active')) {
+                        $('.category-filter').removeClass('active btn-secondary');
+                        category = '';
+                    } else {
+                        $('.category-filter').removeClass('active btn-secondary');
+                        $(this).addClass('active btn-secondary');
+                    }
+                }else if(brand){
+                    if ($(this).hasClass('active')) {
+                        $('.brand-filter').removeClass('active btn-secondary');
+                        brand = '';
+                    } else {
+                        $('.brand-filter').removeClass('active btn-secondary');
+                        $(this).addClass('active btn-secondary');
+                    }
+                }else if(price){
+                    if ($(this).hasClass('active')) {
+                        $('.price-filter').removeClass('active btn-secondary');
+                        price = '';
+                    } else {
+                        $('.price-filter').removeClass('active btn-secondary');
+                        $(this).addClass('active btn-secondary');
+                    }
+                }else if(size){
+                    var radioButton = $('#' + $(this).attr('for'));
+
+                    if (radioButton.prop('checked')) {
+                        radioButton.prop('checked', false);
+                        $(this).removeClass('active btn-secondary');
+                        size=''
+                    } else {
+                        radioButton.prop('checked', true);
+                        $(this).addClass('active btn-secondary');
+
+                        $('.size-filter').not(this).removeClass('active btn-secondary');
+
+                        $('.size-filter').not(this).each(function() {
+                            var otherRadioButton = $('#' + $(this).attr('for'));
+                            otherRadioButton.prop('checked', false);
+                        });
+                    }
+                }else if(color) {
+                    var radioButton = $('#' + $(this).attr('for'));
+
+                    if (radioButton.prop('checked')) {
+                        radioButton.prop('checked', false);
+                        $(this).removeClass('selected');
+                        color = ''
+                    } else {
+                        $(this).addClass('selected');
+                        radioButton.prop('checked', true);
+                    }
+
+                    $('.color-filter').not(this).removeClass('selected');
+
+                    $('.color-filter').not(this).each(function () {
+                        var otherRadioButton = $('#' + $(this).attr('for'));
+                        otherRadioButton.prop('checked', false);
+                    });
+
+                    e.stopImmediatePropagation();
+                }
+
+                // Capture the selected sort price value (dropdown change event)
+                var selectedSort = $(".shop__product__option__right select").val();  // Get the selected value from the dropdown
+                if (selectedSort) {
+                    if (selectedSort === "Low To High") {
+                        sort_price = "Low To High";
+                    } else if (selectedSort === "High To Low") {
+                        sort_price = "High To Low";
+                    } else {
+                        sort_price = "None"; // Handle the "None" option
+                    }
+                }
+
+                var elements = $(".active.btn-secondary, .selected")
+                if (elements) {
+
+                    elements.each(function() {
+                        var el = $(this);
+                        if(el.data('category')){
+                            category = el.data('category')
+                        }else if(el.data('brand')){
+                            brand = el.data('brand')}
+                        else if(el.data('price')) {
+                            price = el.data('price')
+                        }else if(el.data('size')) {
+                            size = el.data('size')
+                        }else if(el.data('color')) {
+                            color = el.data('color')
+                        }
+                        sorted_price = sort_price
+                    });
+                }
+                    filterProducts(category, brand, price, size, color, sorted_price);
+                });
+
+                $(".shop__product__option__right select").change(function() {
+                var selectedSort = $(this).val();  // Get the selected value from the dropdown
+                var category = $('.category-filter.active').data('category') || '';
+                var brand = $('.brand-filter.active').data('brand') || '';
+                var price = $('.price-filter.active').data('price') || '';
+                var size = $('.size-filter.active').data('size') || '';
+                var color = $('.color-filter.selected').data('color') || '';
+                var searchQuery = $('#search-bar').val() || '';
+
+                filterProducts(category, brand, price, size, color, selectedSort);
+
+});
+            function filterProducts(category, brand, price, size, color, sort_price) {
+            $.ajax({
+                url: "{% url 'all-products' %}",
+                data: {
+                    'category': category,
+                    'brand': brand,
+                    'price': price,
+                    'size': size,
+                    'color': color,
+                    'sort-price': sort_price,
+                },
+                dataType: 'json',
+                success: function(response) {
+                    $('#filtered-products').empty();
+
+                    if (response.products && Array.isArray(response.products)) {
+                         var productsLength = response.products.length;
+
+                            var productCountMessage = '';
+                            if (productsLength === 0) {
+                                productCountMessage = `No results`;
+                            } else if (productsLength === 1) {
+                                productCountMessage = `Showing 1 of ${productsLength} result`;
+                            } else if (productsLength < 12) {
+                                productCountMessage = `Showing 1-${productsLength} of ${productsLength} results`;
+                            } else {
+                                productCountMessage = `Showing 1-12 of ${productsLength} results`;
+                            }
+
+                            // Update the product count message dynamically (client-side)
+                            $('.shop__product__option__left').html(`<p>${productCountMessage}</p>`);
+
+                        response.products.forEach(function(product) {
+                            var productHTML = `
+                                <div class="col-lg-4 col-md-6 col-sm-6">
+                                    <div class="product__item product-list" data-category="${product.category}">
+                                        <div class="product__item__pic set-bg" data-setbg="${product.main_image}">
+                                            <img src="${product.main_image}" alt="${product.name}">
+                                            <ul class="product__hover">
+                                                <li><a href="#"><img src="{% static 'img/icon/heart.png' %}" alt=""></a></li>
+                                                <li><a href="#"><img src="{% static 'img/icon/compare.png' %}" alt=""> <span>Compare</span></a></li>
+                                                <li><a href="#"><img src="{% static 'img/icon/search.png' %}" alt=""></a></li>
+                                            </ul>
+                                        </div>
+                                        <div class="product__item__text">
+                                            <h6>${product.name}</h6>  <!-- Use template literals to insert product name -->
+                                            <a href="#" class="add-cart">+ Add To Cart</a>
+                                            <div class="rating">
+                                                <i class="fa fa-star-o"></i>
+                                                <i class="fa fa-star-o"></i>
+                                                <i class="fa fa-star-o"></i>
+                                                <i class="fa fa-star-o"></i>
+                                                <i class="fa fa-star-o"></i>
+
+                                            </div>
+                                            <h5>${product.price}</h5>  <!-- Use template literals to insert product price -->
+                                            <div class="product__color__select">
+                                                <label for="pc-4"><input type="radio" id="pc-4"></label>
+                                                <label class="active black" for="pc-5"><input type="radio" id="pc-5"></label>
+                                                <label class="grey" for="pc-6"><input type="radio" id="pc-6"></label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+
+                            $('#filtered-products').append(productHTML);
+                        });
+                    } else {
+                        console.error("Error: No products found in response.");
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error fetching products: " + error);
+                }
+            });
+
+        }
+            });
+    </script>
+{% endblock %}

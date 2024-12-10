@@ -115,10 +115,6 @@ class Profile(models.Model):
         null=True
     )
 
-    # wishlist = models.ManyToManyField(Product, related_name='wishlisted_by',
-    #                                   blank=True)  # assuming Product model exists
-
-    # User preferences
     newsletter_subscribed = models.BooleanField(
         default=False
     )

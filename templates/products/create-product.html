@@ -1,13 +1,14 @@
 {% extends 'base-form-for-creation.html' %}
 {% load placeholder %}
 {% block create-form %}
-     <div class="signup-form">
+    <div class="signup-form">
         <form action="" method="post" enctype="multipart/form-data">
             {% csrf_token %}
             <h2>Create a product</h2>
             <p>Create a product for the app using this form</p>
             <hr>
             {{  form.errors }}
+
             <div class="form-group">
                 {{ form.name|placeholder:"Name of the product" }}
             </div>
@@ -25,15 +26,9 @@
             </div>
 
             <div class="form-group">
-                {{ form.size|placeholder:"Product size" }}
-            </div>
-
-            <div class="form-group">
                 {{ form.color|placeholder:"Product color" }}
             </div>
-            <div class="form-group">
-                {{ form.stock_quantity|placeholder:"Stock quantity" }}
-            </div>
+
             <div class="form-group">
                 {{ form.sku|placeholder:"SKU" }}
             </div>
@@ -45,17 +40,84 @@
             <div class="form-group">
                 {{ form.category|placeholder:"Product category" }}
             </div>
+
             <div class="form-group">
                 {{ form.brand|placeholder:"Brand name" }}
             </div>
 
-            <div class="form-group">
-                {{ form.is_active|placeholder:"Is the product active?" }}
+            <!-- Полета за количество на размери, които ще се показват/скриват динамично -->
+            <div id="clothing-sizes" style="display: none;">
                 <div class="form-group">
+                    Enter Quantity for XS product: {{ form.xs_quantity }}
+                </div>
+                <div class="form-group">
+                    Enter Quantity for S product: {{ form.s_quantity }}
+                </div>
+                <div class="form-group">
+                    Enter Quantity for M product: {{ form.m_quantity }}
+                </div>
+                <div class="form-group">
+                    Enter Quantity for L product: {{ form.l_quantity }}
+                </div>
+                <div class="form-group">
+                    Enter Quantity for XL product: {{ form.xl_quantity }}
+                </div>
+            </div>
+
+            <div id="shoe-sizes" style="display: none;">
+                <div class="form-group">
+                    Enter Quantity for size 36 product: {{ form.size_36_quantity }}
+                </div>
+                <div class="form-group">
+                    Enter Quantity for size 37 product: {{ form.size_37_quantity }}
+                </div>
+                <div class="form-group">
+                    Enter Quantity for size 38 product: {{ form.size_38_quantity }}
+                </div>
+                <div class="form-group">
+                    Enter Quantity for size 39 product: {{ form.size_39_quantity }}
+                </div>
+                <div class="form-group">
+                    Enter Quantity for size 40 product: {{ form.size_40_quantity }}
+                </div>
+            </div>
+
+            <div class="form-group">
                 <button type="submit" class="btn btn-primary btn-lg">Create the product</button>
-         </div>
             </div>
         </form>
-
     </div>
+
+    <script type="text/javascript">
+        // Проверка за работа на скрипта
+        document.addEventListener('DOMContentLoaded', function () {
+            const categorySelect = document.querySelector('select[name="category"]');
+
+            // Функция за показване на съответните полета
+            function toggleSizeFields() {
+                const category = categorySelect.value.toLowerCase();
+                console.log('Selected category:', category);
+                console.log(category)
+                if (category === '1') {
+                    console.log('Showing clothing sizes'); // Дебъг съобщение за показване на дрехи
+                    document.getElementById('clothing-sizes').style.display = 'block';
+                    document.getElementById('shoe-sizes').style.display = 'none';
+                } else if (category === '2') {
+                    console.log('Showing shoe sizes'); // Дебъг съобщение за показване на обувки
+                    document.getElementById('shoe-sizes').style.display = 'block';
+                    document.getElementById('clothing-sizes').style.display = 'none';
+                } else {
+                    console.log('No category selected or invalid category'); // Дебъг съобщение за друг случай
+                    document.getElementById('clothing-sizes').style.display = 'none';
+                    document.getElementById('shoe-sizes').style.display = 'none';
+                }
+            }
+
+            // Добавяме слушател за промяна на категорията
+            categorySelect.addEventListener('change', toggleSizeFields);
+
+            // Инициализиране на показването на полетата при зареждане на страницата
+            toggleSizeFields();
+        });
+    </script>
 {% endblock %}

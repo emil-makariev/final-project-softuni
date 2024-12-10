@@ -1,0 +1,63 @@
+/* Ensure the form uses flexbox for button alignment */
+.search-form {
+    display: flex;                    /* Use flexbox for aligning elements in a row */
+    align-items: center;              /* Vertically center the items inside the form */
+    position: relative;               /* Positioning context for the buttons */
+}
+
+/* Style for the input field */
+.search-form input {
+    flex-grow: 1;                     /* Allow input to expand and take the available space */
+    padding: 8px 40px 8px 12px;       /* Add padding to the left to make space for buttons */
+    border: 1px solid #ccc;           /* Border around the input field */
+    border-radius: 4px;               /* Optional: Rounded corners for the input */
+    width: 100%;                      /* Make the input take up full width */
+}
+
+/* Style for the buttons inside the input */
+.search-form button {
+    padding: 8px 12px;                /* Padding for buttons */
+    border: 1px solid #ccc;           /* Border for buttons */
+    border-radius: 4px;               /* Rounded corners for buttons */
+    cursor: pointer;                  /* Pointer cursor on hover */
+    background-color: #f1f1f1;        /* Background color for buttons */
+    display: inline-flex;              /* Align icons inside the buttons */
+    justify-content: center;           /* Center the icon inside the button */
+    align-items: center;               /* Vertically align icons inside the button */
+    margin: 0;                         /* Remove margin that could cause spacing issues */
+}
+
+     /* Adjust for perfect centering */
+
+/* Optional: Style for the search button */
+.search-form .search-button {
+    position: absolute;               /* Position search button inside input field */
+    right: 35px;                     /* Place search button on the right side */
+    top: 50%;                          /* Vertically center the button */
+    transform: translateY(-50%);       /* Adjust for perfect centering */
+}
+
+
+
+/* Optional: Icon size */
+.icon_close{
+    font-size: 24px;                  /* Set icon size */
+    color: #333;                      /* Set icon color */
+}
+.icon_search {
+    font-size: 18px;                  /* Set icon size */
+    color: #333;
+}
+
+.icon_search:hover{
+    color: #c3bbbb;
+}
+.icon_close:hover{
+    color: #c3bbbb;
+}
+
+.search-form input{
+    padding: 10px 76px 8px 12px;;
+}
+
+
