@@ -70,7 +70,7 @@
                                     </div>
                                 </td>
                                 <td class="cart__price">
-                                    <span class="total-price" id="total-price-{{ item.product.id }}-{{ item.size.id }}">${{ price_for_a_singe_product|floatformat:2 }}</span>
+                                    <span class="total-price" id="total-price-{{ item.product.id }}-{{ item.size.id }}">${{ item.total_price|floatformat:2 }}</span>
                                 </td>
                                 <td class="cart__close"><i class="fa fa-close"></i></td>
                             </tr>
@@ -116,57 +116,8 @@
 <script>
 
 document.addEventListener("DOMContentLoaded", function () {
-    const decreaseButtons = document.querySelectorAll('.fa-angle-left.dec');
-    const increaseButtons = document.querySelectorAll('.fa-angle-right.inc');
-
-    decreaseButtons.forEach(button => button.remove());
-    increaseButtons.forEach(button => button.remove());
-
+    let counter = 0;
     const quantityInputs = document.querySelectorAll('.quantity-input');
-    const removeButtons = document.querySelectorAll('.cart__close');
-
-        function initializePrices() {
-        quantityInputs.forEach(inputElement => {
-            const priceForSingleProduct = parseFloat(inputElement.getAttribute('data-price'));
-            const currentQuantity = parseInt(inputElement.value);
-
-            // Изчисляваме и обновяваме цената за всеки продукт веднага след зареждането на страницата
-            updatePrice(inputElement, priceForSingleProduct, currentQuantity);
-        });
-    }
-
-    // Обновяване на цената за всеки продукт
-    function updatePrice(inputElement, priceForSingleProduct, currentQuantity) {
-        const totalPrice = currentQuantity * priceForSingleProduct;
-        const totalPriceElement = document.getElementById('total-price-' + inputElement.getAttribute('data-id') + '-' + inputElement.getAttribute('data-size'));
-
-        if (totalPriceElement) {
-            totalPriceElement.textContent = `$${totalPrice.toFixed(2)}`;
-        }
-    }
-
-    // Инициализираме цените при зареждане на страницата
-    initializePrices();
-
-    removeButtons.forEach(button => {
-        button.addEventListener('click', function () {
-            // Намираме реда на продукта
-            const row = button.closest('tr');
-
-            // Вземаме productId и sizeId от съответните атрибути
-            const productId = row.querySelector('.quantity-input').getAttribute('data-id');
-            const sizeId = row.querySelector('.quantity-input').getAttribute('data-size');
-
-            // Потвърждаваме с потребителя, че наистина иска да премахне всички продукти със същия размер
-            if (confirm('Are you sure you want to remove all products with this size from the cart?')) {
-                // Изпращаме AJAX заявка за премахване
-                DeleteItemFromOrder(productId, sizeId);
-
-                // Премахваме реда от DOM
-                row.remove();
-            }
-        });
-    });
 
     quantityInputs.forEach(inputElement => {
         let previousValue = parseInt(inputElement.value);
@@ -177,59 +128,23 @@ document.addEventListener("DOMContentLoaded", function () {
             const productId = parseInt(inputElement.getAttribute('data-id'));
             const sizeId = parseInt(inputElement.getAttribute('data-size'));
 
+            // Проверяваме дали количеството наистина се е променило
             if (currentQuantity !== previousValue) {
+                // Ако количеството е увеличено
                 if (currentQuantity > previousValue) {
                     addItemToOrder(productId, sizeId, currentQuantity);
                 }
+                // Ако количеството е намалено
                 else if (currentQuantity < previousValue) {
-                    removeItemFromOrder(productId, sizeId, currentQuantity);
+                    removeItemFromOrder(productId, sizeId);
                 }
-
-                const priceForSingleProduct = parseFloat(inputElement.getAttribute('data-price'));
-                updatePrice(inputElement, priceForSingleProduct, currentQuantity);
 
                 previousValue = currentQuantity;  // Актуализираме стойността на предишното количество
             }
         });
     });
-            function updatePrice(inputElement, priceForSingleProduct, currentQuantity) {
-            const totalPrice = currentQuantity * priceForSingleProduct;
-            const totalPriceElement = document.getElementById('total-price-' + inputElement.getAttribute('data-id') + '-' + inputElement.getAttribute('data-size'));
 
-            if (totalPriceElement) {
-                totalPriceElement.textContent = `$${totalPrice.toFixed(2)}`;
-            }
-        }
-
-        function DeleteItemFromOrder(productId, sizeId, quantity) {
-            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-
-            fetch('/carts/remove-product-from-order/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': csrfToken
-                },
-                body: JSON.stringify({
-                    product_id: productId,
-                    size_id: sizeId,
-                    quantity: quantity  // Добавяме количеството на премахнатите продукти
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    console.log('Item successfully removed from order');
-                    updateCartTotal();  // Обновяваме общата стойност на количката
-                } else {
-                    console.error('Error removing item from order:', data.message);
-                }
-            })
-            .catch(error => {
-                console.error('Error removing item from order:', error);
-            });
-        }
-
+    // Функция за добавяне на продукт в количката
     function addItemToOrder(productId, sizeId, quantity) {
         const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
@@ -256,7 +171,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // Функция за премахване на продукт от количката
-    function removeItemFromOrder(productId, sizeId, quantity) {
+    function removeItemFromOrder(productId, sizeId) {
         const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
         fetch('/carts/remove-from-order/', {
@@ -268,7 +183,6 @@ document.addEventListener("DOMContentLoaded", function () {
             body: JSON.stringify({
                 product_id: productId,
                 size_id: sizeId,
-                quantity: quantity
             })
         })
         .then(response => response.json())
@@ -281,6 +195,12 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
+    // Актуализираме цената
+    function updatePrice(inputElement, price, currentQuantity) {
+        const totalPrice = currentQuantity * price;
+        const totalPriceElement = document.getElementById('total-price-' + inputElement.getAttribute('data-id') + '-' + inputElement.getAttribute('data-size'));
+        totalPriceElement.textContent = `$${totalPrice.toFixed(2)}`;
+    }
 
     // Функция за актуализиране на общата стойност на количката
     function updateCartTotal() {

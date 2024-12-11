@@ -175,6 +175,8 @@ class AddOrderItems(APIView):
             product=product,
             size=size  # Only associate size if the product has sizes
         )
+        size.stock_quantity -= 1
+        size.save()
 
         # Update the total price of the order (Optional, if you need this logic)
         order.total_price += Decimal(product.price)  # Add product price (you might want to consider quantity)

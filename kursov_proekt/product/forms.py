@@ -1,3 +1,4 @@
+from attr.filters import exclude
 from django import forms
 
 from kursov_proekt.product.choices import ColorChoice, BrandChoice
@@ -9,7 +10,8 @@ class BaseProduct(forms.ModelForm):
 
     class Meta:
         model = Product
-        fields = '__all__'
+        fields = '__all__'  # Включва всички полета
+        exclude = ['num_of_times_purchased']
 
     name = forms.CharField(
         widget=forms.TextInput(attrs={'class': 'form-control'})

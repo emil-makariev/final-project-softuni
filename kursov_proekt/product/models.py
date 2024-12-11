@@ -1,3 +1,4 @@
+from decimal import Decimal
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Max, Sum
@@ -66,6 +67,9 @@ class Product(models.Model):
     is_active = models.BooleanField(
         default=True
     )
+    num_of_times_purchased = models.PositiveIntegerField(
+        default=0
+    )
 
     class Meta:
         permissions = [
@@ -73,12 +77,15 @@ class Product(models.Model):
         ]
 
     def get_discounted_price(self):
-        return self.discount_price if self.discount_price else self.price
+        # Конвертирайте в Decimal
+        return Decimal(self.discount_price) if self.discount_price else Decimal(self.price)
 
     def get_max_stock_quantity(self):
         # Използваме Sum за да вземем общото количество на всички размери
         total_quantity = self.sizes.aggregate(Sum('stock_quantity'))['stock_quantity__sum']
         return total_quantity if total_quantity else 0
+
+
 
 
 class ProductSize(models.Model):
@@ -108,6 +115,7 @@ class ProductSize(models.Model):
 
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='sizes')
     size = models.CharField(max_length=10)
+    max_size = models.PositiveIntegerField(null=True, blank=True)
     stock_quantity = models.PositiveIntegerField(default=10)
 
     def __str__(self):
@@ -131,6 +139,10 @@ class ProductSize(models.Model):
 
     def save(self, *args, **kwargs):
         """Override save method to validate before saving the instance."""
-        self.clean()  # Извикваме метода за валидиране
-        super().save(*args, **kwargs)  # Записваме модела, ако всички проверки преминат успешно
+        """Override save method to validate before saving the instance."""
+        self.clean()  # Call the validation logic before saving
+        if not self.max_size:  # Ensure max_size is set if not already set
+            self.max_size = self.stock_quantity
+        super().save(*args, **kwargs)
+        # Записваме модела, ако всички проверки преминат успешно
 

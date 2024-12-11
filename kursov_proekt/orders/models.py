@@ -69,7 +69,9 @@ class BillingDetails(models.Model):
     last_name = models.CharField(
         max_length=100
     )
-    email = models.EmailField()
+    email = models.EmailField(
+        max_length=20
+    )
     phone_number = models.CharField(
         max_length=20
     )
@@ -85,8 +87,11 @@ class BillingDetails(models.Model):
     country = models.CharField(
         max_length=100
     )
-    age = models.IntegerField(
-
+    account_password = models.CharField(
+        max_length=20,
+    )
+    order_notes = models.CharField(
+        max_length=500,
     )
 
     def __str__(self):
