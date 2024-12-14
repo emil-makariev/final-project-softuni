@@ -1,7 +1,7 @@
 from django.db import models
 
 from kursov_proekt.accounts.models import Profile
-from kursov_proekt.product.models import Product, ProductSize
+from kursov_proekt.product.models import Product, ProductSize, Accessory
 
 
 # Create your models here.
@@ -42,7 +42,8 @@ class Orders(models.Model):
 
 class OrderItems(models.Model):
 
-    size = models.ForeignKey(ProductSize, on_delete=models.CASCADE, related_name='order_items', default=None)
+    size = models.ForeignKey(ProductSize, on_delete=models.CASCADE, related_name='order_items', default=None,  null=True, blank=True)
+    accessory = models.ForeignKey(Accessory,  on_delete=models.CASCADE, related_name='order_items_accessory', default=None,  null=True, blank=True)
 
     order = models.ForeignKey(
         to=Orders,

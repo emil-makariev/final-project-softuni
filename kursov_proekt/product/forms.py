@@ -2,7 +2,7 @@ from attr.filters import exclude
 from django import forms
 
 from kursov_proekt.product.choices import ColorChoice, BrandChoice
-from kursov_proekt.product.models import Product, Category, ProductSize
+from kursov_proekt.product.models import Product, Category, ProductSize, Accessory
 
 
 class BaseProduct(forms.ModelForm):
@@ -66,6 +66,8 @@ class BaseProduct(forms.ModelForm):
     size_41_quantity = forms.IntegerField(widget=forms.NumberInput(attrs={'class': 'form-control'}), required=False)
     size_42_quantity = forms.IntegerField(widget=forms.NumberInput(attrs={'class': 'form-control'}), required=False)
 
+    accessory_quantity = forms.IntegerField(widget=forms.NumberInput(attrs={'class': 'form-control'}), required=False)
+
     def save(self, commit=True):
         product = super(BaseProduct, self).save(commit=False)
 
@@ -75,7 +77,18 @@ class BaseProduct(forms.ModelForm):
             # Изчисляваме общото количество от размерите
             total_quantity = 0
 
+            if self.instance.category.name.lower() == 'accessories':
+                self.instance.is_active = True
+                # Добавяме само едно поле за общото количество на аксесоарите
+                accessory_quantity = self.cleaned_data.get('accessory_quantity', 0)
+                total_quantity += accessory_quantity  # Добавяме количеството на аксесоара
+                if accessory_quantity > 0:
+                    # Създаване на аксесоар без размер
+                    Accessory.objects.create(product=product, stock_quantity=accessory_quantity)
+
             if self.instance.category.name.lower() == 'clothing':
+                self.instance.is_active = True
+
                 sizes = ['XS', 'S', 'M', 'L', 'XL']
                 for size in sizes:
                     quantity_field = f"{size.lower()}_quantity"
@@ -96,6 +109,8 @@ class BaseProduct(forms.ModelForm):
 
 
             elif self.instance.category.name.lower() == 'shoes':
+                self.instance.is_active = True
+
                 sizes = ['36', '37', '38', '39', '40', '41', '42']
                 for size in sizes:
                     quantity_field = f"size_{size}_quantity"

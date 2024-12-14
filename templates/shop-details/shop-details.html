@@ -1,6 +1,29 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block content %}
+    <style>
+        .size-options {
+            position: relative;
+            z-index: 10;
+            }
+
+        .size-option {
+            cursor: pointer; /* Pointer cursor to show it's clickable */
+            display: inline-block;
+            margin: 5px;
+        }
+
+        .size-option.selected {
+            background-color: #e6dddd;
+            color: white;
+            border-color: #e6dddd;
+        }
+
+        .size-option:hover {
+            background-color: #e6dddd;
+        }
+    </style>
 
     <!-- Shop Details Section Begin -->
     <section class="shop-details">
@@ -9,63 +32,21 @@
                 <div class="row">
                     <div class="col-lg-12">
                         <div class="product__details__breadcrumb">
-                            <a href="../common/index.html">Home</a>
-                            <a href="../common/shop.html">Shop</a>
+                            <a href="{% url 'common' %}">Home</a>
+                            <a href="{% url 'all-products' %}">Shop</a>
                             <span>Product Details</span>
                         </div>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-lg-3 col-md-3">
-                        <ul class="nav nav-tabs" role="tablist">
-                            <li class="nav-item">
-                                <a class="nav-link active" data-toggle="tab" href="#tabs-1" role="tab">
-                                    <div class="product__thumb__pic set-bg" data-setbg="img/shop-details/thumb-1.png">
-                                    </div>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" data-toggle="tab" href="#tabs-2" role="tab">
-                                    <div class="product__thumb__pic set-bg" data-setbg="img/shop-details/thumb-2.png">
-                                    </div>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" data-toggle="tab" href="#tabs-3" role="tab">
-                                    <div class="product__thumb__pic set-bg" data-setbg="img/shop-details/thumb-3.png">
-                                    </div>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" data-toggle="tab" href="#tabs-4" role="tab">
-                                    <div class="product__thumb__pic set-bg" data-setbg="img/shop-details/thumb-4.png">
-                                        <i class="fa fa-play"></i>
-                                    </div>
-                                </a>
-                            </li>
-                        </ul>
+
                     </div>
                     <div class="col-lg-6 col-md-9">
                         <div class="tab-content">
                             <div class="tab-pane active" id="tabs-1" role="tabpanel">
                                 <div class="product__details__pic__item">
-                                    <img src="img/shop-details/product-big-2.png" alt="">
-                                </div>
-                            </div>
-                            <div class="tab-pane" id="tabs-2" role="tabpanel">
-                                <div class="product__details__pic__item">
-                                    <img src="img/shop-details/product-big-3.png" alt="">
-                                </div>
-                            </div>
-                            <div class="tab-pane" id="tabs-3" role="tabpanel">
-                                <div class="product__details__pic__item">
-                                    <img src="img/shop-details/product-big.png" alt="">
-                                </div>
-                            </div>
-                            <div class="tab-pane" id="tabs-4" role="tabpanel">
-                                <div class="product__details__pic__item">
-                                    <img src="img/shop-details/product-big-4.png" alt="">
-                                    <a href="https://www.youtube.com/watch?v=8PJ3_p7VqHw&list=RD8PJ3_p7VqHw&start_radio=1" class="video-popup"><i class="fa fa-play"></i></a>
+                                    <img src="{{ object.main_image.url }}" alt="">
                                 </div>
                             </div>
                         </div>
@@ -78,35 +59,29 @@
                 <div class="row d-flex justify-content-center">
                     <div class="col-lg-8">
                         <div class="product__details__text">
-                            <h4>Hooded thermal anorak</h4>
-                            <div class="rating">
-                                <i class="fa fa-star"></i>
-                                <i class="fa fa-star"></i>
-                                <i class="fa fa-star"></i>
-                                <i class="fa fa-star"></i>
-                                <i class="fa fa-star-o"></i>
-                                <span> - 5 Reviews</span>
-                            </div>
-                            <h3>$270.00 <span>70.00</span></h3>
-                            <p>Coat with quilted lining and an adjustable hood. Featuring long sleeves with adjustable
-                                cuff tabs, adjustable asymmetric hem with elastic side tabs and a front zip fastening
-                            with placket.</p>
+                            <h4>{{ object.name }}</h4>
+                            <h3>{{ object.price }} $</h3>
+                            <p>{{ object.description }}</p>
                             <div class="product__details__option">
                                 <div class="product__details__option__size">
                                     <span>Size:</span>
-                                    <label for="xxl">xxl
-                                        <input type="radio" id="xxl">
+                                    <label class="active" for="xl">XL
+                                        <input type="radio" name="size" value="XL" id="xl">
                                     </label>
-                                    <label class="active" for="xl">xl
-                                        <input type="radio" id="xl">
+                                    <label for="l">L
+                                        <input type="radio" name="size" value="L" id="l">
                                     </label>
-                                    <label for="l">l
-                                        <input type="radio" id="l">
+                                    <label for="m">M
+                                        <input type="radio" name="size" value="M" id="m">
                                     </label>
-                                    <label for="sm">s
-                                        <input type="radio" id="sm">
+                                    <label for="s">S
+                                        <input type="radio" name="size" value="S" id="s">
+                                    </label>
+                                    <label for="xs">XS
+                                        <input type="radio" name="size" value="XS" id="xs">
                                     </label>
                                 </div>
+
                                 <div class="product__details__option__color">
                                     <span>Color:</span>
                                     <label class="c-1" for="sp-1">
@@ -129,22 +104,30 @@
                             <div class="product__details__cart__option">
                                 <div class="quantity">
                                     <div class="pro-qty">
-                                        <input type="text" value="1">
+                                        <input type="number"
+                                                   value="{{ item.count }}"
+                                                   class="quantity-input"
+                                                   data-price="{{ object.price }}"
+                                                   data-id="{{ object.id }}"
+                                                   data-size="{{ object.size.id }}"
+                                                   {% if object.accessory%}
+                                                        data-max-quantity="{{ object.product.accessory.max_quantity_accessory }}"
+                                                        min="1" max="{{ object.product.accessory.max_quantity_accessory }}">
+                                                   {% else %}
+                                                        data-max-quantity="{{ object.max_quantity }}"
+                                                        min="1" max="{{ object.max_quantity }}">
+                                                   {% endif %}
                                     </div>
                                 </div>
-                                <a href="#" class="primary-btn">add to cart</a>
+                                <a href="#" class="primary-btn" id="add-to-cart-btn">add to cart</a>
                             </div>
                             <div class="product__details__btns__option">
                                 <a href="#"><i class="fa fa-heart"></i> add to wishlist</a>
-                                <a href="#"><i class="fa fa-exchange"></i> Add To Compare</a>
                             </div>
                             <div class="product__details__last__option">
-                                <h5><span>Guaranteed Safe Checkout</span></h5>
-                                <img src="img/shop-details/details-payment.png" alt="">
                                 <ul>
                                     <li><span>SKU:</span> 3812912</li>
-                                    <li><span>Categories:</span> Clothes</li>
-                                    <li><span>Tag:</span> Clothes, Skin, Body</li>
+                                    <li><span>Categories:</span> {{ object.category.name }}</li>
                                 </ul>
                             </div>
                         </div>
@@ -284,145 +267,594 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-lg-3 col-md-6 col-sm-6 col-sm-6">
-                    <div class="product__item">
-                        <div class="product__item__pic set-bg" data-setbg="img/product/product-1.jpg">
-                            <span class="label">New</span>
-                            <ul class="product__hover">
-                                <li><a href="#"><img src="img/icon/heart.png" alt=""></a></li>
-                                <li><a href="#"><img src="img/icon/compare.png" alt=""> <span>Compare</span></a></li>
-                                <li><a href="#"><img src="img/icon/search.png" alt=""></a></li>
-                            </ul>
-                        </div>
-                        <div class="product__item__text">
-                            <h6>Piqué Biker Jacket</h6>
-                            <a href="#" class="add-cart">+ Add To Cart</a>
-                            <div class="rating">
-                                <i class="fa fa-star-o"></i>
-                                <i class="fa fa-star-o"></i>
-                                <i class="fa fa-star-o"></i>
-                                <i class="fa fa-star-o"></i>
-                                <i class="fa fa-star-o"></i>
-                            </div>
-                            <h5>$67.24</h5>
-                            <div class="product__color__select">
-                                <label for="pc-1">
-                                    <input type="radio" id="pc-1">
-                                </label>
-                                <label class="active black" for="pc-2">
-                                    <input type="radio" id="pc-2">
-                                </label>
-                                <label class="grey" for="pc-3">
-                                    <input type="radio" id="pc-3">
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6 col-sm-6 col-sm-6">
-                    <div class="product__item">
-                        <div class="product__item__pic set-bg" data-setbg="img/product/product-2.jpg">
-                            <ul class="product__hover">
-                                <li><a href="#"><img src="img/icon/heart.png" alt=""></a></li>
-                                <li><a href="#"><img src="img/icon/compare.png" alt=""> <span>Compare</span></a></li>
-                                <li><a href="#"><img src="img/icon/search.png" alt=""></a></li>
-                            </ul>
-                        </div>
-                        <div class="product__item__text">
-                            <h6>Piqué Biker Jacket</h6>
-                            <a href="#" class="add-cart">+ Add To Cart</a>
-                            <div class="rating">
-                                <i class="fa fa-star-o"></i>
-                                <i class="fa fa-star-o"></i>
-                                <i class="fa fa-star-o"></i>
-                                <i class="fa fa-star-o"></i>
-                                <i class="fa fa-star-o"></i>
-                            </div>
-                            <h5>$67.24</h5>
-                            <div class="product__color__select">
-                                <label for="pc-4">
-                                    <input type="radio" id="pc-4">
-                                </label>
-                                <label class="active black" for="pc-5">
-                                    <input type="radio" id="pc-5">
-                                </label>
-                                <label class="grey" for="pc-6">
-                                    <input type="radio" id="pc-6">
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6 col-sm-6 col-sm-6">
-                    <div class="product__item sale">
-                        <div class="product__item__pic set-bg" data-setbg="img/product/product-3.jpg">
-                            <span class="label">Sale</span>
-                            <ul class="product__hover">
-                                <li><a href="#"><img src="img/icon/heart.png" alt=""></a></li>
-                                <li><a href="#"><img src="img/icon/compare.png" alt=""> <span>Compare</span></a></li>
-                                <li><a href="#"><img src="img/icon/search.png" alt=""></a></li>
-                            </ul>
-                        </div>
-                        <div class="product__item__text">
-                            <h6>Multi-pocket Chest Bag</h6>
-                            <a href="#" class="add-cart">+ Add To Cart</a>
-                            <div class="rating">
-                                <i class="fa fa-star"></i>
-                                <i class="fa fa-star"></i>
-                                <i class="fa fa-star"></i>
-                                <i class="fa fa-star"></i>
-                                <i class="fa fa-star-o"></i>
-                            </div>
-                            <h5>$43.48</h5>
-                            <div class="product__color__select">
-                                <label for="pc-7">
-                                    <input type="radio" id="pc-7">
-                                </label>
-                                <label class="active black" for="pc-8">
-                                    <input type="radio" id="pc-8">
-                                </label>
-                                <label class="grey" for="pc-9">
-                                    <input type="radio" id="pc-9">
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6 col-sm-6 col-sm-6">
-                    <div class="product__item">
-                        <div class="product__item__pic set-bg" data-setbg="img/product/product-4.jpg">
-                            <ul class="product__hover">
-                                <li><a href="#"><img src="img/icon/heart.png" alt=""></a></li>
-                                <li><a href="#"><img src="img/icon/compare.png" alt=""> <span>Compare</span></a></li>
-                                <li><a href="#"><img src="img/icon/search.png" alt=""></a></li>
-                            </ul>
-                        </div>
-                        <div class="product__item__text">
-                            <h6>Diagonal Textured Cap</h6>
-                            <a href="#" class="add-cart">+ Add To Cart</a>
-                            <div class="rating">
-                                <i class="fa fa-star-o"></i>
-                                <i class="fa fa-star-o"></i>
-                                <i class="fa fa-star-o"></i>
-                                <i class="fa fa-star-o"></i>
-                                <i class="fa fa-star-o"></i>
-                            </div>
-                            <h5>$60.9</h5>
-                            <div class="product__color__select">
-                                <label for="pc-10">
-                                    <input type="radio" id="pc-10">
-                                </label>
-                                <label class="active black" for="pc-11">
-                                    <input type="radio" id="pc-11">
-                                </label>
-                                <label class="grey" for="pc-12">
-                                    <input type="radio" id="pc-12">
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                {% for product in similar_products %}
+                        <div class="col-lg-3 col-md-6 col-sm-6 col-sm-6">
+                                    <div class="product__item product-list">
+                                        <div class="product__item__pic set-bg" data-setbg="{{ product.main_image.url }}">
+                                            <img src="{{ product.main_image.url }}" alt="{{ product.name }}">
+
+                                            <ul class="product__hover">
+                                                <li><a href=""><img src="{% static 'img/icon/heart.png' %}" alt=""></a><span>Like it</span></li>
+                                            </ul>
+                                        </div>
+
+                                        <div class="product__item__text">
+                                            <h6>{{ product.name }}</h6>
+
+                                            <!-- Add to Cart button -->
+                                            <a href="javascript:void(0);" class="add-cart" data-product-id="{{ product.id }}">+ Add To Cart</a>
+
+                                            <!-- Choose a size text (this will be shown when "Add to Cart" is clicked) -->
+                                            <div id="choose-size-text-{{ product.id }}" style="display:none;">
+                                                <p>Choose a size</p>
+                                                <a href="javascript:void(0);" class="close-size-selection" data-product-id="{{ product.id }}">
+                                                        <span class="icon_close"></span>
+                                                </a>
+                                            </div>
+
+                                            <!-- Size selection form (initially hidden) -->
+                                                <div class="size-selection-form" id="size-selection-{{ product.id }}" style="display:none;">
+                                                    <form id="size-form-{{ product.id }}" class="size-form">
+                                                        <div class="size-options" id="size-options-{{ product.id }}" style="display: flex; justify-content: space-around">
+                                                            <!-- Dynamically generated size options -->
+                                                        </div>
+                                                        <button type="submit" class="btn btn-secondary">Add to Cart</button>
+                                                    </form>
+                                                </div>
+
+                                            <h5>{{ product.price }}</h5>
+                                            <div class="product__color__select">
+                                                <label for="pc-4">
+                                                    <input type="radio" id="pc-4">
+                                                </label>
+                                                <label class="active black" for="pc-5">
+                                                    <input type="radio" id="pc-5">
+                                                </label>
+                                                <label class="grey" for="pc-6">
+                                                    <input type="radio" id="pc-6">
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+
+
             </div>
         </div>
     </section>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const decreaseButtons = document.querySelectorAll('.fa.fa-angle-up.dec.qtybtn');
+        const increaseButtons = document.querySelectorAll('.fa.fa-angle-down.inc.qtybtn');
+
+        decreaseButtons.forEach(button => button.remove());
+        increaseButtons.forEach(button => button.remove());
+
+        const quantityInputs = document.querySelectorAll('.quantity-input');
+        console.log(quantityInputs)
+
+        quantityInputs.forEach(inputElement => {
+        let previousValue = parseInt(inputElement.value);
+        let currentQuantity = parseInt(inputElement.value);
+        console.log('Current Quantity: ', currentQuantity);
+
+        inputElement.addEventListener('input', function () {
+            let currentQuantity = parseInt(inputElement.value);
+            const productId = parseInt(inputElement.getAttribute('data-id'));
+            const sizeId = parseInt(inputElement.getAttribute('data-size'));
+
+            if (currentQuantity !== previousValue) {
+                if (currentQuantity > previousValue) {
+                    addItemToOrder(productId, sizeId, currentQuantity);
+                }
+                else if (currentQuantity < previousValue) {
+                    removeItemFromOrder(productId, sizeId, currentQuantity);
+                }
+
+                const priceForSingleProduct = parseFloat(inputElement.getAttribute('data-price'));
+                updatePrice(inputElement, priceForSingleProduct, currentQuantity);
+
+                previousValue = currentQuantity;  // Актуализираме стойността на предишното количество
+            }
+        });
+    });
+
+    document.getElementById('add-to-cart-btn').addEventListener('click', function(e) {
+        e.preventDefault();  // Спиране на стандартното поведение на бутона
+
+        // Вземане на избрания размер
+        var selectedSize = document.querySelector('input[name="size"]:checked');
+
+        if (!selectedSize) {
+            alert('Моля, изберете размер');
+            return;  // Прекратяваме изпълнението, ако няма избран размер
+        }
+
+        // Вземане на избрания размер
+        var size = selectedSize.value;
+        var productId = '{{ product.id }}';
+        var quantity = document.querySelector('input[type="number"]').value;
+        const url = `/product/add-to-cart/${productId}/`;
+        fetch(url, {
+
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'  // CSRF токен за защита на POST заявката
+            },
+            body: JSON.stringify({
+                product_id: productId,
+                size: size,
+                quantity: quantity
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.detail === "Product added to cart successfully.") {
+                alert('Продуктът беше добавен в кошницата!');
+            } else {
+                alert('Грешка при добавяне на продукта в кошницата.');
+            }
+        })
+        .catch(error => {
+            console.error('Грешка:', error);
+            alert('Грешка при добавяне на продукта в кошницата.');
+        });
+    });
+});
+
+
+        $(document).ready(function() {
+    // Обработване на клик върху бутона "Add to Cart" (показване на формата за избор на размер)
+    $('.add-cart').click(function(event) {
+        event.preventDefault();  // Предотвратяваме стандартното поведение
+
+        var productId = $(this).data('product-id');  // Вземаме ID на продукта
+        var sizeSelectionForm = $('#size-selection-' + productId); // Вземаме формата за избор на размер
+        var sizeOptionsDiv = $('#size-options-' + productId); // Вземаме контейнера за опциите за размери
+        var addToCartButton = $(this); // Бутонът "Add to Cart"
+        var chooseSizeText = $('#choose-size-text-' + productId); // Текста "Choose a size"
+
+        // Скриваме бутона "Add to Cart" и показваме формата за избор на размер
+        addToCartButton.hide();  // Скриваме бутона
+        sizeSelectionForm.show(); // Показваме формата
+        chooseSizeText.show();  // Показваме текста "Choose a size"
+
+        // Извършваме AJAX заявка за наличните размери за продукта
+        var url = '/product/get-sizes/' + productId + '/';  // URL за извличане на размерите
+        var csrfToken = $('meta[name="csrf-token"]').attr('content');  // Вземаме CSRF токена
+
+        $.ajax({
+            url: url,  // API endpoint за заявка за размери
+            method: 'GET',  // Използваме GET за получаване на размери
+            headers: {
+                'X-CSRFToken': csrfToken  // Добавяме CSRF токен за сигурност
+            },
+            success: function(response) {
+                if (response.sizes) {
+                    // Почистваме старите опции за размери преди да добавим нови
+                    sizeOptionsDiv.empty();
+
+                    // Добавяме новите опции за размери към формата
+                    response.sizes.forEach(function(size) {
+                        var sizeOption = '<label class="size-option"><input type="radio" name="size" value="' + size.size + '"> ' + size.size + ' (' + size.stock_quantity + ') </label><br>';
+
+                        // Ако количеството е по-малко или равно на 0, правим опцията неактивна
+                        if (size.stock_quantity <= 0) {
+                            sizeOption = '<label class="size-option disabled"><input type="radio" name="size" value="' + size.size + '" disabled> ' + size.size + ' (' + size.stock_quantity + ') </label><br>';
+                        }
+
+                        // Добавяме опцията към контейнера
+                        sizeOptionsDiv.append(sizeOption);
+                    });
+
+                    // Добавяме събитие при избор на размер
+                    $('.size-option').click(function() {
+                        var selectedSize = $(this).find('input').val(); // Вземаме избрания размер
+
+                        // Подчертаваме избрания размер
+                        $(this).addClass('selected').siblings().removeClass('selected');
+
+                        // Записваме избрания размер в data атрибута на формата
+                        $('#size-selection-' + productId).data('selected-size', selectedSize);
+                    });
+                } else {
+                    alert('Няма налични размери за този продукт.');
+                }
+            },
+            error: function(xhr, status, error) {
+                alert('Грешка при извличането на размерите.');
+                console.log(xhr.responseText);  // Логваме грешките
+            }
+        });
+    });
+});
+
+    // Handle the form submission (when user clicks "Add to Cart" after selecting a size)
+    $(document).on('submit', '.size-form', function(event) {
+        event.preventDefault();  // Prevent form submission
+
+        var productId = $(this).attr('id').split('-')[2];  // Get the product ID from the form ID
+        var selectedSize = $('#size-selection-' + productId).data('selected-size');  // Get the selected size
+
+        if (!selectedSize) {
+            // If no size is selected, show an error message
+            alert("Please select a size before adding to cart.");
+            return;  // Prevent form submission if no size is selected
+        }
+
+        // Send the selected size and product ID to the server to add the item to the cart
+        var url = '/product/add-to-cart/' + productId + '/';  // API endpoint to add the product to the cart
+        var csrfToken = $('meta[name="csrf-token"]').attr('content');  // CSRF token
+
+        $.ajax({
+            url: url,  // API endpoint to handle the POST request
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrfToken  // Include CSRF token for security
+            },
+            data: {
+                product_id: productId,
+                size: selectedSize  // Send selected size with the request
+            },
+            success: function(response) {
+                alert('Product added to cart!');
+                console.log(response);  // Log the response from the server
+
+                // After adding the product to the cart, reset the form and size selection
+                $('#choose-size-text-' + productId).hide();
+                $('#size-selection-' + productId).hide();
+                $('a[data-product-id="' + productId + '"]').show();  // Show the "Add to Cart" button again
+
+                // Clear selected size data to ensure it doesn't persist
+                $('#size-selection-' + productId).data('selected-size', null);  // Reset the selected size
+
+                // Optionally, you can clear the selected radio button to avoid any stale data
+                $('#size-options-' + productId).find('input[type="radio"]').prop('checked', false);
+            },
+            error: function(xhr, status, error) {
+                alert('Error adding product to cart.');
+                console.log(xhr.responseText);  // Log any error messages
+            }
+        });
+    });
+
+    // Close the size selection when the "x" link is clicked
+    $(document).on('click', '.close-size-selection', function(event) {
+        var productId = $(this).data('product-id');  // Get the product ID from the clicked link
+        var sizeSelectionForm = $('#size-selection-' + productId); // Get the size selection form
+        var chooseSizeText = $('#choose-size-text-' + productId); // The "Choose a size" text
+        var addToCartButton = $('a[data-product-id="' + productId + '"]'); // Get the Add to Cart button
+
+        // Hide the size selection form and "Choose a size" text
+        sizeSelectionForm.hide();
+        chooseSizeText.hide();
+
+        // Show the "Add to Cart" button again
+        addToCartButton.show();
+    })
+
+
+
+        $(document).ready(function(){
+            $(".category-filter, .brand-filter, .price-filter, .size-filter, .color-filter, .price-sort").click(function(e){
+                e.preventDefault();
+
+                var category = $(this).data('category');
+                var brand = $(this).data('brand');
+                var price = $(this).data('price');
+                var size = $(this).data('size');
+                var color = $(this).data('color');
+
+                var sort_price = '';
+
+                var searchQuery = $('#searchbar').val() || '';
+
+                if(category){
+                    if ($(this).hasClass('active')) {
+                        $('.category-filter').removeClass('active btn-secondary');
+                        category = '';
+                    } else {
+                        $('.category-filter').removeClass('active btn-secondary');
+                        $(this).addClass('active btn-secondary');
+                    }
+                }else if(brand){
+                    if ($(this).hasClass('active')) {
+                        $('.brand-filter').removeClass('active btn-secondary');
+                        brand = '';
+                    } else {
+                        $('.brand-filter').removeClass('active btn-secondary');
+                        $(this).addClass('active btn-secondary');
+                    }
+                }else if(price){
+                    if ($(this).hasClass('active')) {
+                        $('.price-filter').removeClass('active btn-secondary');
+                        price = '';
+                    } else {
+                        $('.price-filter').removeClass('active btn-secondary');
+                        $(this).addClass('active btn-secondary');
+                    }
+                }else if(size){
+                    var radioButton = $('#' + $(this).attr('for'));
+
+                    if (radioButton.prop('checked')) {
+                        radioButton.prop('checked', false);
+                        $(this).removeClass('active btn-secondary');
+                        size=''
+                    } else {
+                        radioButton.prop('checked', true);
+                        $(this).addClass('active btn-secondary');
+
+                        $('.size-filter').not(this).removeClass('active btn-secondary');
+
+                        $('.size-filter').not(this).each(function() {
+                            var otherRadioButton = $('#' + $(this).attr('for'));
+                            otherRadioButton.prop('checked', false);
+                        });
+                    }
+                }else if(color) {
+                    var radioButton = $('#' + $(this).attr('for'));
+
+                    if (radioButton.prop('checked')) {
+                        radioButton.prop('checked', false);
+                        $(this).removeClass('selected');
+                        color = ''
+                    } else {
+                        $(this).addClass('selected');
+                        radioButton.prop('checked', true);
+                    }
+
+                    $('.color-filter').not(this).removeClass('selected');
+
+                    $('.color-filter').not(this).each(function () {
+                        var otherRadioButton = $('#' + $(this).attr('for'));
+                        otherRadioButton.prop('checked', false);
+                    });
+
+                    e.stopImmediatePropagation();
+                }
+
+
+                // Capture the selected sort price value (dropdown change event)
+                var selectedSort = $(".shop__product__option__right select").val();  // Get the selected value from the dropdown
+                if (selectedSort) {
+                    if (selectedSort === "Low To High") {
+                        sort_price = "Low To High";
+                    } else if (selectedSort === "High To Low") {
+                        sort_price = "High To Low";
+                    } else {
+                        sort_price = "None"; // Handle the "None" option
+                    }
+                }
+
+                var elements = $(".active.btn-secondary, .selected")
+                if (elements) {
+
+                    elements.each(function() {
+                        var el = $(this);
+                        if(el.data('category')){
+                            category = el.data('category')
+                        }else if(el.data('brand')){
+                            brand = el.data('brand')}
+                        else if(el.data('price')) {
+                            price = el.data('price')
+                        }else if(el.data('size')) {
+                            size = el.data('size')
+                        }else if(el.data('color')) {
+                            color = el.data('color')
+                        }
+                        sorted_price = sort_price
+                        searched_data = searchQuery
+                    });
+                }
+                    filterProducts(category, brand, price, size, color, sorted_price, searched_data);
+                });
+
+                $(".shop__product__option__right select").change(function() {
+                var selectedSort = $(this).val();  // Get the selected value from the dropdown
+                var category = $('.category-filter.active').data('category') || '';
+                var brand = $('.brand-filter.active').data('brand') || '';
+                var price = $('.price-filter.active').data('price') || '';
+                var size = $('.size-filter.active').data('size') || '';
+                var color = $('.color-filter.selected').data('color') || '';
+                var searchQuery = $('#searchbar').val() || '';
+
+                $('#searchbar').val(searchQuery);  // Populate the search field with the current search term
+
+
+                filterProducts(category, brand, price, size, color, selectedSort, searchQuery);
+
+        });
+            function filterProducts(category, brand, price, size, color, sort_price, searchQuery) {
+    $.ajax({
+        url: "{% url 'all-products' %}",
+        data: {
+            'category': category,
+            'brand': brand,
+            'price': price,
+            'size': size,
+            'color': color,
+            'sort-price': sort_price,
+            'search_data': searchQuery,
+        },
+        dataType: 'json',
+        success: function(response) {
+            $('#filtered-products').empty();
+
+            if (response.products && Array.isArray(response.products)) {
+                var productsLength = response.products.length;
+                var productCountMessage = '';
+                if (productsLength === 0) {
+                    productCountMessage = `No results`;
+                } else if (productsLength === 1) {
+                    productCountMessage = `Showing 1 of ${productsLength} result`;
+                } else if (productsLength < 12) {
+                    productCountMessage = `Showing 1-${productsLength} of ${productsLength} results`;
+                } else {
+                    productCountMessage = `Showing 1-12 of ${productsLength} results`;
+                }
+
+                // Update the product count message dynamically (client-side)
+                $('.shop__product__option__left').html(`<p>${productCountMessage}</p>`);
+
+                response.products.forEach(function(product) {
+                    var productHTML = `
+                        <div class="col-lg-4 col-md-6 col-sm-6">
+                            <div class="product__item product-list" data-category="${product.category}">
+                                <div class="product__item__pic set-bg" data-setbg="${ product.main_image}">
+                                    <img src="${ product.main_image }" alt="${ product.name }">
+
+                                    <ul class="product__hover">
+                                        <li><a href=""><img src="{% static 'img/icon/heart.png' %}" alt=""></a><span>Like it</span></li>
+                                        <li><a href="#"><img src="{% static 'img/icon/compare.png' %}" alt=""> <span>Compare</span></a></li>
+                                        <li><a href="#"><img src="{% static 'img/icon/search.png' %}" alt=""></a><span>Search</span></li>
+                                    </ul>
+                                </div>
+
+                                <div class="product__item__text">
+                                    <h6>${ product.name }</h6>
+
+                                    <!-- Add to Cart button -->
+                                    <a href="javascript:void(0);" class="add-cart" data-product-id="${ product.id }">+ Add To Cart</a>
+
+                                    <!-- Choose a size text (this will be shown when "Add to Cart" is clicked) -->
+                                    <div id="choose-size-text-${ product.id }" style="display:none;">
+                                        <p>Choose a size</p>
+                                        <a href="javascript:void(0);" class="close-size-selection" data-product-id="${ product.id }">
+                                            <span class="icon_close"></span>
+                                        </a>
+                                    </div>
+
+                                    <!-- Size selection form (initially hidden) -->
+                                    <div class="size-selection-form" id="size-selection-${ product.id }" style="display:none;">
+                                        <form id="size-form-${ product.id }" class="size-form">
+                                            <div class="size-options" id="size-options-${ product.id }" style="display: flex; justify-content: space-around">
+                                                <!-- Dynamically generated size options -->
+                                            </div>
+                                            <button type="submit" class="btn btn-secondary">Add to Cart</button>
+                                        </form>
+                                    </div>
+
+                                    <div class="rating">
+                                        <i class="fa fa-star-o"></i>
+                                        <i class="fa fa-star-o"></i>
+                                        <i class="fa fa-star-o"></i>
+                                        <i class="fa fa-star-o"></i>
+                                        <i class="fa fa-star-o"></i>
+                                    </div>
+
+                                    <h5>${ product.price }</h5>
+                                    <div class="product__color__select">
+                                        <label for="pc-4">
+                                            <input type="radio" id="pc-4">
+                                        </label>
+                                        <label class="active black" for="pc-5">
+                                            <input type="radio" id="pc-5">
+                                        </label>
+                                        <label class="grey" for="pc-6">
+                                            <input type="radio" id="pc-6">
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    $('#filtered-products').append(productHTML);
+                });
+
+                // Handle the "Add to Cart" button click
+                $('.add-cart').click(function(event) {
+                    event.preventDefault();  // Prevent default action
+
+                    var productId = $(this).data('product-id');  // Get the product ID
+                    var sizeSelectionForm = $('#size-selection-' + productId); // Get the size selection form
+                    var sizeOptionsDiv = $('#size-options-' + productId); // Get the size options container
+                    var addToCartButton = $(this); // The Add to Cart button
+                    var chooseSizeText = $('#choose-size-text-' + productId); // The "Choose a size" text
+
+                    // Show the size selection form when the "Add to Cart" button is clicked
+                    sizeSelectionForm.show();
+
+                    // Hide the "Add to Cart" button
+                    addToCartButton.hide();
+
+                    // Show the "Choose a size" text and ensure it stays visible
+                    chooseSizeText.show();
+
+                    // Fetch available sizes for the product via AJAX
+                    var url = '/product/get-sizes/' + productId + '/';  // Correct URL for fetching sizes
+                    var csrfToken = $('meta[name="csrf-token"]').attr('content');  // CSRF token
+
+                    $.ajax({
+                        url: url,  // API endpoint to handle the GET request
+                        method: 'GET',  // Use GET to fetch sizes
+                        headers: {
+                            'X-CSRFToken': csrfToken  // Include CSRF token for security
+                        },
+                        success: function(response) {
+                            if (response.sizes) {
+                                // Clear any existing size options before adding new ones
+                                sizeOptionsDiv.empty();
+
+                                // Dynamically add size options to the form (now wrapped in <label>)
+                                response.sizes.forEach(function(size) {
+                                    sizeOptionsDiv.append(
+                                        '<label class="size-option"><input type="radio" name="size" value="' + size + '"> ' + size + '</label><br>'
+                                    );
+                                });
+
+                                // Add click event listener to size options
+                                $('.size-option').click(function() {
+                                    var selectedSize = $(this).find('input').val(); // Get the selected size
+
+                                    // Optionally, highlight the selected size
+                                    $(this).addClass('selected').siblings().removeClass('selected');
+
+                                    // Store the selected size in a data attribute
+                                    $('#size-selection-' + productId).data('selected-size', selectedSize);
+                                });
+                            } else {
+                                alert('No sizes available for this product.');
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            alert('Error fetching product sizes.');
+                            console.log(xhr.responseText);  // Log any error messages
+                        }
+                    });
+                });
+
+                // Handle the close (X) button click
+                $(document).on('click', '.close-size-selection', function(event) {
+                    var productId = $(this).data('product-id');  // Get the product ID from the clicked link
+                    var sizeSelectionForm = $('#size-selection-' + productId); // Get the size selection form
+                    var chooseSizeText = $('#choose-size-text-' + productId); // The "Choose a size" text
+                    var addToCartButton = $('a[data-product-id="' + productId + '"]'); // Get the Add to Cart button
+
+                    // Hide the size selection form and "Choose a size" text
+                    sizeSelectionForm.hide();
+                    chooseSizeText.hide();
+
+                    // Show the "Add to Cart" button again
+                    addToCartButton.show();
+                });
+
+            } else {
+                console.error("Error: No products found in response.");
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error("Error fetching products: " + error);
+        }
+    });
+}
+            })
+</script>
+
 {% endblock %}

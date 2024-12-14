@@ -23,6 +23,12 @@
         .size-option:hover {
             background-color: #e6dddd;
         }
+        .disabled {
+                color: #999;
+                cursor: not-allowed;  /* Курсорът ще бъде неактивен */
+    opacity: 0.5; /* Светло сив цвят за текста */
+            }
+
     </style>
 
     <section class="breadcrumb-option">
@@ -230,12 +236,12 @@
                                 <div class="col-lg-4 col-md-6 col-sm-6">
                                     <div class="product__item product-list">
                                         <div class="product__item__pic set-bg" data-setbg="{{ product.main_image.url }}">
-                                            <img src="{{ product.main_image.url }}" alt="{{ product.name }}">
+                                            <a href="{% url 'detail_product' product.pk %}">
+                                                <img src="{{ product.main_image.url }}" alt="{{ product.name }}">
+                                            </a>
 
                                             <ul class="product__hover">
                                                 <li><a href=""><img src="{% static 'img/icon/heart.png' %}" alt=""></a><span>Like it</span></li>
-                                                <li><a href="#"><img src="{% static 'img/icon/compare.png' %}" alt=""> <span>Compare</span></a></li>
-                                                <li><a href="#"><img src="{% static 'img/icon/search.png' %}" alt=""></a><span>Search</span></li>
                                             </ul>
                                         </div>
 
@@ -243,7 +249,7 @@
                                             <h6>{{ product.name }}</h6>
 
                                             <!-- Add to Cart button -->
-                                            <a href="javascript:void(0);" class="add-cart" data-product-id="{{ product.id }}">+ Add To Cart</a>
+                                            <a href="javascript:void(0);" class="add-cart" data-product-id="{{ product.id }}" data-product-type="{{ product.category.name }}" data-accessory-id="{{product.accessory.id}}">+ Add To Cart</a>
 
                                             <!-- Choose a size text (this will be shown when "Add to Cart" is clicked) -->
                                             <div id="choose-size-text-{{ product.id }}" style="display:none;">
@@ -259,19 +265,11 @@
                                                         <div class="size-options" id="size-options-{{ product.id }}" style="display: flex; justify-content: space-around">
                                                             <!-- Dynamically generated size options -->
                                                         </div>
-                                                        <button type="submit" class="btn btn-secondary">Add to Cart</button>
+                                                        {% if user_logged_in %}
+                                                            <button type="submit" class="btn btn-secondary">Add to Cart</button>
+                                                        {% endif %}
                                                     </form>
                                                 </div>
-
-                                            <div class="rating">
-                                                <i class="fa fa-star-o"></i>
-                                                <i class="fa fa-star-o"></i>
-                                                <i class="fa fa-star-o"></i>
-                                                <i class="fa fa-star-o"></i>
-                                                <i class="fa fa-star-o"></i>
-                                                <script src="{% static 'js/stars-logic.js' %}"></script>
-                                            </div>
-
                                             <h5>{{ product.price }}</h5>
                                             <div class="product__color__select">
                                                 <label for="pc-4">
@@ -328,24 +326,84 @@
     <!-- Shop Section End -->
 
     <!-- Footer Section Begin -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <script>
+
+            var closeButton = document.querySelector('.icon_close');
+
+        // Add click event listener
+        closeButton.addEventListener('click', function() {
+            // Clear the search query (e.g., input field)
+            var searchInput = document.getElementById('searchbar');
+            searchInput.value = '';  // Clears the input field
+            console.log(searchInput)
+
+            // Optionally, you could also clear any other displayed search query
+            // For example, if you have a div or span showing the search query, clear it:
+            var displayedQuery = document.getElementById('displayedSearchQuery');
+            if (displayedQuery) {
+                displayedQuery.textContent = '';  // Clear the displayed query
+            }
+        });
+
         $(document).ready(function() {
     // Обработване на клик върху бутона "Add to Cart" (показване на формата за избор на размер)
     $('.add-cart').click(function(event) {
         event.preventDefault();  // Предотвратяваме стандартното поведение
 
         var productId = $(this).data('product-id');  // Вземаме ID на продукта
-        var sizeSelectionForm = $('#size-selection-' + productId); // Вземаме формата за избор на размер
+        var productType = $(this).data('product-type');  // Вземаме ID на продукта
+
+        var sizeSelectionForm = $('#size-selection-' + productId);
         var sizeOptionsDiv = $('#size-options-' + productId); // Вземаме контейнера за опциите за размери
         var addToCartButton = $(this); // Бутонът "Add to Cart"
         var chooseSizeText = $('#choose-size-text-' + productId); // Текста "Choose a size"
+        var accessory_id = $(this).data('accessory-id');
 
-        // Скриваме бутона "Add to Cart" и показваме формата за избор на размер
+
+        if (productType === 'accessories') {
+                addToCart(productId, null, accessory_id);  // Изпращаме заявка за добавяне в количката без размер
+                return;  // Прекратяваме изпълнението на останалата част от кода
+            }
+
         addToCartButton.hide();  // Скриваме бутона
         sizeSelectionForm.show(); // Показваме формата
         chooseSizeText.show();  // Показваме текста "Choose a size"
+
+        function addToCart(productId, size, accessory_id) {
+            var url = '/product/add-to-cart/' + productId + '/'
+            var csrfToken = $('meta[name="csrf-token"]').attr('content');  // CSRF token for security
+
+            $.ajax({
+                url: url,
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrfToken
+                },
+                data: {
+                    product_id: productId,
+                    size: size  // If size is provided, it will be sent
+                },
+                success: function(response) {
+                    alert('Product added to cart!');
+                    console.log(response);
+                    // You can also update the cart icon or other UI elements here
+                },
+                error: function(xhr, status, error) {
+                        console.log('assas')
+                        addToCartButton.addClass('disabled')
+                        event.preventDefault()
+                        alert('This accessory is out of stock');
+                            return
+
+
+
+                    console.log(xhr.responseText);
+                }
+            });
+        }
+
 
         // Извършваме AJAX заявка за наличните размери за продукта
         var url = '/product/get-sizes/' + productId + '/';  // URL за извличане на размерите
@@ -362,30 +420,39 @@
                     // Почистваме старите опции за размери преди да добавим нови
                     sizeOptionsDiv.empty();
 
-                    // Добавяме новите опции за размери към формата
                     response.sizes.forEach(function(size) {
-                        var sizeOption = '<label class="size-option"><input type="radio" name="size" value="' + size.size + '"> ' + size.size + ' (' + size.stock_quantity + ') </label><br>';
+                        var sizeOption = '<label class="size-option"><input type="radio" name="size" value="' + size.size + '"> ' + size.size + '  </label><br>';
 
                         // Ако количеството е по-малко или равно на 0, правим опцията неактивна
                         if (size.stock_quantity <= 0) {
-                            sizeOption = '<label class="size-option disabled"><input type="radio" name="size" value="' + size.size + '" disabled> ' + size.size + ' (' + size.stock_quantity + ') </label><br>';
+                            sizeOption = '<label class="size-option disabled"><input type="radio" name="size" value="' + size.size + '" disabled=""> ' + size.size + '  </label><br>';
+                            sizeOption.disabled = true
+
+
                         }
 
                         // Добавяме опцията към контейнера
                         sizeOptionsDiv.append(sizeOption);
                     });
 
+
                     // Добавяме събитие при избор на размер
                     $('.size-option').click(function() {
-                        var selectedSize = $(this).find('input').val(); // Вземаме избрания размер
+                    if ($(this).hasClass('disabled')) {
+                        alert('This product is out of stock in the selected size.')
+                        return;  // Прекратяваме изпълнението на функцията, ако е деактивиран
+                    }
 
-                        // Подчертаваме избрания размер
-                        $(this).addClass('selected').siblings().removeClass('selected');
+                    var selectedSize = $(this).find('input').val(); // Вземаме избрания размер
 
-                        // Записваме избрания размер в data атрибута на формата
-                        $('#size-selection-' + productId).data('selected-size', selectedSize);
-                    });
-                } else {
+                    // Подчертаваме избрания размер
+                    $(this).addClass('selected').siblings().removeClass('selected');
+
+                    // Записваме избрания размер в data атрибута на формата
+                    $('#size-selection-' + productId).data('selected-size', selectedSize);
+                });
+                                } else {
+
                     alert('Няма налични размери за този продукт.');
                 }
             },
@@ -440,7 +507,7 @@
                 $('#size-options-' + productId).find('input[type="radio"]').prop('checked', false);
             },
             error: function(xhr, status, error) {
-                alert('Error adding product to cart.');
+                alert('You have exceeded the value of the products, please choose another one');
                 console.log(xhr.responseText);  // Log any error messages
             }
         });
@@ -460,7 +527,6 @@
         // Show the "Add to Cart" button again
         addToCartButton.show();
     })
-
 
 
 
@@ -627,15 +693,15 @@
 
                 response.products.forEach(function(product) {
                     var productHTML = `
+
                         <div class="col-lg-4 col-md-6 col-sm-6">
                             <div class="product__item product-list" data-category="${product.category}">
                                 <div class="product__item__pic set-bg" data-setbg="${ product.main_image}">
+                                <a href="/product/product-details/${product.id}">
                                     <img src="${ product.main_image }" alt="${ product.name }">
-
+                                </a>
                                     <ul class="product__hover">
                                         <li><a href=""><img src="{% static 'img/icon/heart.png' %}" alt=""></a><span>Like it</span></li>
-                                        <li><a href="#"><img src="{% static 'img/icon/compare.png' %}" alt=""> <span>Compare</span></a></li>
-                                        <li><a href="#"><img src="{% static 'img/icon/search.png' %}" alt=""></a><span>Search</span></li>
                                     </ul>
                                 </div>
 
@@ -643,7 +709,8 @@
                                     <h6>${ product.name }</h6>
 
                                     <!-- Add to Cart button -->
-                                    <a href="javascript:void(0);" class="add-cart" data-product-id="${ product.id }">+ Add To Cart</a>
+                                  <a href="javascript:void(0);" class="add-cart" data-product-id="${ product.id }" data-product-type="${product.category}">+ Add To Cart</a>
+
 
                                     <!-- Choose a size text (this will be shown when "Add to Cart" is clicked) -->
                                     <div id="choose-size-text-${ product.id }" style="display:none;">
@@ -663,13 +730,6 @@
                                         </form>
                                     </div>
 
-                                    <div class="rating">
-                                        <i class="fa fa-star-o"></i>
-                                        <i class="fa fa-star-o"></i>
-                                        <i class="fa fa-star-o"></i>
-                                        <i class="fa fa-star-o"></i>
-                                        <i class="fa fa-star-o"></i>
-                                    </div>
 
                                     <h5>${ product.price }</h5>
                                     <div class="product__color__select">
@@ -700,6 +760,22 @@
                     var addToCartButton = $(this); // The Add to Cart button
                     var chooseSizeText = $('#choose-size-text-' + productId); // The "Choose a size" text
 
+                    var productType = $(this).data('product-type');  // Вземаме ID на продукта
+
+                    if (productType === 3) {
+                            addToCart(productId, null);  // Изпращаме заявка за добавяне в количката без размер
+                            return;  // Прекратяваме изпълнението на останалата част от кода
+                        }
+
+
+                    console.log('Product Id: ', productId)
+                    console.log('sizeSelectionForm: ', sizeSelectionForm)
+                    console.log('sizeOptionsDiv', sizeOptionsDiv)
+                    console.log('addToCartButton: ', addToCartButton)
+                    console.log('chooseSizeText', chooseSizeText)
+                    console.log('------------------------------')
+
+
                     // Show the size selection form when the "Add to Cart" button is clicked
                     sizeSelectionForm.show();
 
@@ -710,46 +786,82 @@
                     chooseSizeText.show();
 
                     // Fetch available sizes for the product via AJAX
+
+                    function addToCart(productId, size) {
+                        var url = '/product/add-to-cart/' + productId + '/'
+                        var csrfToken = $('meta[name="csrf-token"]').attr('content');  // CSRF token for security
+
+                        $.ajax({
+                            url: url,
+                            method: 'POST',
+                            headers: {
+                                'X-CSRFToken': csrfToken
+                            },
+                            data: {
+                                product_id: productId,
+                                size: size  // If size is provided, it will be sent
+                            },
+                            success: function(response) {
+                                alert('Product added to cart!');
+                                console.log(response);
+                                // You can also update the cart icon or other UI elements here
+                            },
+                            error: function(xhr, status, error) {
+                                alert('Error adding to cart.');
+                                console.log(xhr.responseText);
+                            }
+                        });
+                    }
+
                     var url = '/product/get-sizes/' + productId + '/';  // Correct URL for fetching sizes
                     var csrfToken = $('meta[name="csrf-token"]').attr('content');  // CSRF token
 
                     $.ajax({
-                        url: url,  // API endpoint to handle the GET request
-                        method: 'GET',  // Use GET to fetch sizes
-                        headers: {
-                            'X-CSRFToken': csrfToken  // Include CSRF token for security
-                        },
-                        success: function(response) {
-                            if (response.sizes) {
-                                // Clear any existing size options before adding new ones
-                                sizeOptionsDiv.empty();
+            url: url,  // API endpoint за заявка за размери
+            method: 'GET',  // Използваме GET за получаване на размери
+            headers: {
+                'X-CSRFToken': csrfToken  // Добавяме CSRF токен за сигурност
+            },
+            success: function(response) {
+                if (response.sizes) {
+                    // Почистваме старите опции за размери преди да добавим нови
+                    sizeOptionsDiv.empty();
 
-                                // Dynamically add size options to the form (now wrapped in <label>)
-                                response.sizes.forEach(function(size) {
-                                    sizeOptionsDiv.append(
-                                        '<label class="size-option"><input type="radio" name="size" value="' + size + '"> ' + size + '</label><br>'
-                                    );
-                                });
+                    // Добавяме новите опции за размери към формата
+                    response.sizes.forEach(function(size) {
+                        var sizeOption = '<label class="size-option"><input type="radio" name="size" value="' + size.size + '"> ' + size.size + '  </label><br>';
 
-                                // Add click event listener to size options
-                                $('.size-option').click(function() {
-                                    var selectedSize = $(this).find('input').val(); // Get the selected size
-
-                                    // Optionally, highlight the selected size
-                                    $(this).addClass('selected').siblings().removeClass('selected');
-
-                                    // Store the selected size in a data attribute
-                                    $('#size-selection-' + productId).data('selected-size', selectedSize);
-                                });
-                            } else {
-                                alert('No sizes available for this product.');
-                            }
-                        },
-                        error: function(xhr, status, error) {
-                            alert('Error fetching product sizes.');
-                            console.log(xhr.responseText);  // Log any error messages
+                        // Ако количеството е по-малко или равно на 0, правим опцията неактивна
+                        if (size.stock_quantity <= 0) {
+                            sizeOption = '<label class="size-option disabled"><input type="radio" name="size" value="' + size.size + '" disabled=""> ' + size.size + '  </label><br>';
+                            sizeOption.disabled = true
                         }
+
+                        // Добавяме опцията към контейнера
+                        sizeOptionsDiv.append(sizeOption);
                     });
+
+
+                    // Добавяме събитие при избор на размер
+                    $('.size-option').click(function() {
+                        var selectedSize = $(this).find('input').val(); // Вземаме избрания размер
+
+                        // Подчертаваме избрания размер
+                        $(this).addClass('selected').siblings().removeClass('selected');
+
+                        // Записваме избрания размер в data атрибута на формата
+                        $('#size-selection-' + productId).data('selected-size', selectedSize);
+                    });
+                } else {
+                    alert('Няма налични размери за този продукт.');
+                }
+            },
+            error: function(xhr, status, error) {
+                alert('Грешка при извличането на размерите.');
+                console.log(xhr.responseText);  // Логваме грешките
+            }
+        });
+
                 });
 
                 // Handle the close (X) button click
@@ -765,7 +877,11 @@
 
                     // Show the "Add to Cart" button again
                     addToCartButton.show();
-                });
+
+                }
+
+
+                );
 
             } else {
                 console.error("Error: No products found in response.");

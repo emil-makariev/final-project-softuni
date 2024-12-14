@@ -64,8 +64,13 @@
                                                    data-price="{{ item.product.price }}"
                                                    data-id="{{ item.product.id }}"
                                                    data-size="{{ item.size.id }}"
-                                                   data-max-quantity="{{ item.max_quantity }}"
-                                                   min="1" max="{{ item.max_quantity }}">
+                                                   {% if item.product.accessory%}
+                                                        data-max-quantity="{{ item.product.accessory.max_quantity_accessory }}"
+                                                        min="1" max="{{ item.product.accessory.max_quantity_accessory }}">
+                                                   {% else %}
+                                                        data-max-quantity="{{ item.max_quantity }}"
+                                                        min="1" max="{{ item.max_quantity }}">
+                                                   {% endif %}
                                         </div>
                                     </div>
                                 </td>
@@ -102,8 +107,8 @@
                 <div class="cart__total">
                     <h6>Cart total</h6>
                     <ul>
-                        <li>Subtotal <span id="cart-total-price">$ 169.50</span></li>
-                        <li>Total <span id="cart-total-price">$ 169.50</span></li>
+                        <li>Subtotal <span id="cart-total-price"></span></li>
+                        <li>Total <span id="cart-total-price"></span></li>
                     </ul>
                     <a href="#" class="primary-btn">Proceed to checkout</a>
                 </div>
@@ -127,16 +132,22 @@ document.addEventListener("DOMContentLoaded", function () {
 
         function initializePrices() {
         quantityInputs.forEach(inputElement => {
-            const priceForSingleProduct = parseFloat(inputElement.getAttribute('data-price'));
-            const currentQuantity = parseInt(inputElement.value);
+            console.log('Input Element: ', inputElement)
 
-            // Изчисляваме и обновяваме цената за всеки продукт веднага след зареждането на страницата
+            const priceForSingleProduct = parseFloat(inputElement.getAttribute('data-price'));
+            console.log('Price for a single product: ', priceForSingleProduct)
+
+            const currentQuantity = parseInt(inputElement.value);
+            console.log('Current Quantity: ', currentQuantity)
+
             updatePrice(inputElement, priceForSingleProduct, currentQuantity);
+            updateCartTotal(inputElement, priceForSingleProduct, currentQuantity);
         });
     }
 
     // Обновяване на цената за всеки продукт
     function updatePrice(inputElement, priceForSingleProduct, currentQuantity) {
+        console.log('Product was sent here')
         const totalPrice = currentQuantity * priceForSingleProduct;
         const totalPriceElement = document.getElementById('total-price-' + inputElement.getAttribute('data-id') + '-' + inputElement.getAttribute('data-size'));
 
@@ -148,7 +159,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // Инициализираме цените при зареждане на страницата
     initializePrices();
 
-    removeButtons.forEach(button => {
+     removeButtons.forEach(button => {
         button.addEventListener('click', function () {
             // Намираме реда на продукта
             const row = button.closest('tr');
@@ -168,10 +179,13 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 
+
+
     quantityInputs.forEach(inputElement => {
         let previousValue = parseInt(inputElement.value);
+        let currentQuantity = parseInt(inputElement.value);
+        console.log('Current Quantity: ', currentQuantity);
 
-        // Обработчик за промените в quantity
         inputElement.addEventListener('input', function () {
             let currentQuantity = parseInt(inputElement.value);
             const productId = parseInt(inputElement.getAttribute('data-id'));
@@ -201,34 +215,56 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         }
 
-        function DeleteItemFromOrder(productId, sizeId, quantity) {
-            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    function DeleteItemFromOrder(productId, sizeId, quantity) {
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    console.log('Product ID:', productId);
+    console.log('Size ID:', sizeId);
+    console.log('Quantity:', quantity);
 
-            fetch('/carts/remove-product-from-order/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': csrfToken
-                },
-                body: JSON.stringify({
-                    product_id: productId,
-                    size_id: sizeId,
-                    quantity: quantity  // Добавяме количеството на премахнатите продукти
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    console.log('Item successfully removed from order');
-                    updateCartTotal();  // Обновяваме общата стойност на количката
-                } else {
-                    console.error('Error removing item from order:', data.message);
-                }
-            })
-            .catch(error => {
-                console.error('Error removing item from order:', error);
+    // Създаваме request body с основните параметри
+    const requestBody = {
+        product_id: productId
+    };
+
+    // Добавяме size_id и quantity само ако са налични
+    if (sizeId) {
+        requestBody.size_id = sizeId;
+    }
+    if (quantity) {
+        requestBody.quantity = quantity;
+    }
+
+
+    // Правим fetch заявката
+    fetch('/carts/remove-product-from-order/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify(requestBody)
+    })
+    .then(response => {
+        if (!response.ok) {
+            // Ако не е успешен отговор (например 400 грешка)
+            return response.json().then(data => {
+                throw new Error(data.message || 'Something went wrong');
             });
         }
+        return response.json();
+    })
+    .then(data => {
+        if (data.status === 'success') {
+            console.log('Item successfully removed from order');
+            updateCartTotal();  // Обновяваме общата стойност на количката
+        } else {
+            console.error('Error removing item from order:', data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error removing item from order:', error);
+    });
+}
 
     function addItemToOrder(productId, sizeId, quantity) {
         const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
@@ -283,7 +319,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     // Функция за актуализиране на общата стойност на количката
-    function updateCartTotal() {
+    function updateCartTotal(inputElement, priceForSingleProduct, currentQuantity) {
         fetch('/carts/update-cart-total/', {
             method: 'GET',
             headers: {
@@ -293,8 +329,15 @@ document.addEventListener("DOMContentLoaded", function () {
         .then(response => response.json())
         .then(data => {
             if (data.status === 'success') {
-                const totalPriceElement = document.getElementById('cart-total-price');
-                totalPriceElement.textContent = `$${data.total_price.toFixed(2)}`;
+                data.cur_q = currentQuantity;
+                const totalPriceElement = document.querySelectorAll('#cart-total-price');
+                console.log(totalPriceElement)
+                totalPriceElement.forEach(el => {
+                    // Here, set the content for each element
+                    el.textContent = `$${parseFloat(data.total_price).toFixed(2)}`;
+                });
+
+
             }
         })
         .catch(error => {

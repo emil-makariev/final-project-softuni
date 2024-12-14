@@ -4,7 +4,7 @@ from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404
 from django.template.response import TemplateResponse
 from django.urls import reverse_lazy
-from django.views.generic import ListView, CreateView, UpdateView, FormView
+from django.views.generic import ListView, CreateView, UpdateView, FormView, DetailView
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.generics import CreateAPIView
@@ -15,7 +15,7 @@ from rest_framework.views import APIView
 from kursov_proekt.orders.models import Orders, OrderItems
 from kursov_proekt.orders.serializer import OrderItemsSerializer
 from kursov_proekt.product.forms import CreateProduct, SearchForm
-from kursov_proekt.product.models import Product, Category, ProductSize
+from kursov_proekt.product.models import Product, Category, ProductSize, Accessory
 from kursov_proekt.product.serializers import ProductSerializer
 
 
@@ -28,7 +28,7 @@ class DashboardProducts(ListView):
     paginate_by = 12
 
     def get_queryset(self):
-        queryset = super().get_queryset()
+        queryset = Product.objects.filter(is_active=True)  # Само активни продукти
 
         category_name = self.request.GET.get('category')
         brand_name = self.request.GET.get('brand')
@@ -79,7 +79,9 @@ class DashboardProducts(ListView):
 
         if size:
             try:
-                queryset = queryset.filter(size=size)
+                # Filter products by the size in the related ProductSize model
+                queryset = queryset.filter(sizes__size=size, sizes__stock_quantity__gt=0)
+                print(queryset)
             except Exception as e:
                 print(f"Error occurred: {e}")
 
@@ -149,8 +151,9 @@ class AddOrderItems(APIView):
 
         # Check if the product has sizes
         size = None
-        if product.sizes:
-            if not size_name:
+        accessory = None
+        if product.sizes.exists():
+            if not size_name and product.category.name != 'accessories':  # Assuming 'accessories' doesn't need size
                 return Response({"detail": "Size is required for this product."}, status=status.HTTP_400_BAD_REQUEST)
 
             try:
@@ -158,8 +161,13 @@ class AddOrderItems(APIView):
                 size = product.sizes.get(size=size_name)  # Assuming the size field in ProductSize is 'name'
             except ProductSize.DoesNotExist:
                 return Response({"detail": "Size not found."}, status=status.HTTP_404_NOT_FOUND)
+        elif product.accessory:
+            try:
+                accessory = product.accessory
+            except Accessory.DoesNotExist:
+                return Response({"detail": "Accessory not found."}, status=status.HTTP_404_NOT_FOUND)
 
-        # Retrieve or create the user's order (status=False means 'pending' order status)
+
         user = request.user  # Get the logged-in user
         profile = user.profile  # Assuming each user has a profile
 
@@ -173,10 +181,17 @@ class AddOrderItems(APIView):
         order_item = OrderItems.objects.create(
             order=order,
             product=product,
-            size=size  # Only associate size if the product has sizes
+            size=size,
+            accessory=accessory,
         )
-        size.stock_quantity -= 1
-        size.save()
+
+        if size:
+            size.stock_quantity -= 1
+            size.save()
+
+        elif accessory:
+            accessory.stock_quantity -= 1
+            accessory.save()
 
         # Update the total price of the order (Optional, if you need this logic)
         order.total_price += Decimal(product.price)  # Add product price (you might want to consider quantity)
@@ -189,6 +204,23 @@ class AddOrderItems(APIView):
         }, status=status.HTTP_201_CREATED)
 
 
+    def get(self, request, *args, **kwargs):
+        # Get the filtered products based on the request parameters
+        products = Product.objects.filter(...)  # Your filtering logic
+
+        product_data = []
+        for product in products:
+            sizes = [size.size for size in product.sizes.all()] if product.sizes.exists() else []
+            product_data.append({
+                'id': product.id,
+                'name': product.name,
+                'price': product.price,
+                'main_image': product.main_image.url,
+                'sizes': sizes,  # Add the sizes here (empty if no sizes exist)
+            })
+
+        return Response({'products': product_data})
+
 def get_product_sizes(request, pk):
     try:
         product = Product.objects.get(id=pk)  # Вземаме продукта по ID
@@ -197,7 +229,6 @@ def get_product_sizes(request, pk):
 
         size_data = []
         for size in sizes:
-            # Добавяме информация за размера и количеството
             size_data.append({
                 'size': size.size,
                 'stock_quantity': size.stock_quantity,
@@ -208,3 +239,19 @@ def get_product_sizes(request, pk):
 
     except Product.DoesNotExist:
         return JsonResponse({'error': 'Product not found'}, status=404)
+
+
+class ProductDetail(DetailView):
+    template_name = 'shop-details/shop-details.html'
+    model = Product
+
+
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        product = self.object
+        category = product.category_id
+
+        context['similar_products'] = Product.objects.filter(is_active=True, category=category).exclude(id=product.id)
+        return context
+

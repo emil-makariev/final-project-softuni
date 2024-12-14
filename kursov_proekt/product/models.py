@@ -86,7 +86,27 @@ class Product(models.Model):
         return total_quantity if total_quantity else 0
 
 
+class Accessory(models.Model):
+    product = models.OneToOneField(
+        Product,
+        primary_key=True,
+        on_delete=models.CASCADE,
+        related_name='accessory'
+    )
+    stock_quantity = models.PositiveIntegerField(default=10)
+    max_quantity_accessory = models.PositiveIntegerField(null=True, blank=True)
 
+    def clean(self):
+        if self.stock_quantity < 0:
+            raise ValidationError(f"Stock quantity cannot be negative. Provided value: {self.stock_quantity}.")
+
+    def save(self, *args, **kwargs):
+        """Override save method to validate before saving the instance."""
+        """Override save method to validate before saving the instance."""
+        self.clean()  # Call the validation logic before saving
+        if not self.max_quantity_accessory:  # Ensure max_size is set if not already set
+            self.max_quantity_accessory = self.stock_quantity
+        super().save(*args, **kwargs)
 
 class ProductSize(models.Model):
     SIZE_CHOICES_CLOTHES = [
@@ -145,4 +165,3 @@ class ProductSize(models.Model):
             self.max_size = self.stock_quantity
         super().save(*args, **kwargs)
         # Записваме модела, ако всички проверки преминат успешно
-

@@ -96,32 +96,37 @@
                             </div>
                         </div>
                         <div class="col-lg-4 col-md-6">
-    <div class="checkout__order">
-        <h4 class="order__title">Your order</h4>
-        <div class="checkout__order__products">Product <span>Total</span></div>
-        <ul class="checkout__total__products">
-            {% for category, sizes in grouped_items.items %}
-                {% for size, item in sizes.items %}
-                    <li>
-                        {{ forloop.counter }}. {{ item.product.name }} ({{ size }})
-                        <span>${{ item.total_price|floatformat:2 }} (x{{ item.quantity }})</span>
-                    </li>
-                {% endfor %}
-            {% endfor %}
-        </ul>
-        <ul class="checkout__total__all">
-            <li>Total <span>${{ order.total_price|floatformat:2 }}</span></li>
-        </ul>
+                            <div class="checkout__order">
+                                <h4 class="order__title">Your order</h4>
+                                <div class="checkout__order__products">Product <span>Total</span></div>
+                                <ul class="checkout__total__products">
+                                    {% for category, sizes in grouped_items.items %}
+                                        {% for size, item in sizes.items %}
+                                            <li>
+                                                {% if category != 'accessories' %}
+                                                    {{ forloop.counter }}. {{ item.product.name }} ({{ size }} size)
+                                                    <span>${{ item.total_price|floatformat:2 }} (x{{ item.quantity }})</span>
+                                                {% else %}
+                                                    {{ forloop.counter }}. {{ item.product.name }}
+                                                    <span>${{ item.total_price|floatformat:2 }} (x{{ item.quantity }})</span>
+                                                {% endif %}
+                                            </li>
+                                        {% endfor %}
+                                    {% endfor %}
+                                </ul>
+                                <ul class="checkout__total__all">
+                                    <li>Total <span>${{total_price_for_same_products|floatformat:2 }}</span></li>
+                                </ul>
 
-        <p>Lorem ipsum dolor sit amet, consectetur adip elit, sed do eiusmod tempor incididunt
-        ut labore et dolore magna aliqua.</p>
+                                <p>Lorem ipsum dolor sit amet, consectetur adip elit, sed do eiusmod tempor incididunt
+                                ut labore et dolore magna aliqua.</p>
 
-        <div class="checkout__input__checkbox">
-            <!-- Checkbox, if any -->
-        </div>
-        <button type="submit" class="site-btn">PLACE ORDER</button>
-    </div>
-</div>
+                                <div class="checkout__input__checkbox">
+                                    <!-- Checkbox, if any -->
+                                </div>
+                                <button type="submit" class="site-btn">PLACE ORDER</button>
+                            </div>
+                        </div>
                     </div>
                 </form>
             </div>
