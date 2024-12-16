@@ -97,12 +97,16 @@ def add_to_order(request):
                 try:
                     searched_size = ProductSize.objects.get(id=size_id)
                     size = product.sizes.get(size=searched_size.size)  # Assuming the size field in ProductSize is 'name'
+                    if size.stock_quantity - 1 < 0:
+                        return JsonResponse({'datail: Size out of stock'}, status=404)
                 except ProductSize.DoesNotExist:
                     return JsonResponse({"detail": "Size not found."}, status=404)
 
             elif product.accessory:
                 try:
                     accessory = product.accessory
+                    if accessory.stock_quantity - 1 < 0:
+                        return JsonResponse({'datail: Accessory out of stock'}, status=404)
                 except Accessory.DoesNotExist:
                     return JsonResponse({"detail": "Accessory not found."}, status=404)
 
@@ -202,6 +206,8 @@ def remove_from_order(request):
             try:
                 searched_size = ProductSize.objects.get(id=size_id)
                 size = product.sizes.get(size=searched_size.size)
+
+
             except ProductSize.DoesNotExist:
                 return JsonResponse({"detail": "Size not found."}, status=404)
 

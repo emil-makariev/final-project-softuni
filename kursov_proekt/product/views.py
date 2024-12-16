@@ -144,6 +144,7 @@ class AddOrderItems(APIView):
             return Response({"detail": "Product ID is required."}, status=status.HTTP_400_BAD_REQUEST)
 
         # Retrieve the product from the database
+
         try:
             product = Product.objects.get(id=product_id)
         except Product.DoesNotExist:
@@ -155,15 +156,18 @@ class AddOrderItems(APIView):
         if product.sizes.exists():
             if not size_name and product.category.name != 'accessories':  # Assuming 'accessories' doesn't need size
                 return Response({"detail": "Size is required for this product."}, status=status.HTTP_400_BAD_REQUEST)
-
             try:
                 # Fetch the size associated with the product by size name
-                size = product.sizes.get(size=size_name)  # Assuming the size field in ProductSize is 'name'
+                size = product.sizes.get(size=size_name)
+                if size.stock_quantity - 1 < 0:
+                    return Response({"detail": "Quantity for this product size is zero"}, status=status.HTTP_400_BAD_REQUEST)
             except ProductSize.DoesNotExist:
                 return Response({"detail": "Size not found."}, status=status.HTTP_404_NOT_FOUND)
         elif product.accessory:
             try:
                 accessory = product.accessory
+                if accessory.stock_quantity - 1 < 0:
+                    return Response({"detail": "Quantity for this product size is zero"}, status=status.HTTP_400_BAD_REQUEST)
             except Accessory.DoesNotExist:
                 return Response({"detail": "Accessory not found."}, status=status.HTTP_404_NOT_FOUND)
 

@@ -8,10 +8,13 @@ class EmailOrUsernameBackend(ModelBackend):
 
         if username is None:
             username = kwargs.get(custom_user_model.USERNAME_FIELD)
+        try:
+            searched_user = custom_user_model.objects.get(email=username)
+        except custom_user_model.DoesNotExist:
+            try:
+                searched_user = custom_user_model.objects.get(username=username)
+            except custom_user_model.DoesNotExist:
+                return None
 
-        # Use the helper function to get the user
-        searched_user = self.get_user_by_username_or_email(username)
-
-        if searched_user and searched_user.check_password(password) and self.user_can_authenticate(searched_user):
+        if searched_user.check_password(password) and self.user_can_authenticate(searched_user):
             return searched_user
-

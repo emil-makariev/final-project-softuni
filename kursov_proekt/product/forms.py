@@ -6,7 +6,6 @@ from kursov_proekt.product.models import Product, Category, ProductSize, Accesso
 
 
 class BaseProduct(forms.ModelForm):
-    # CATEGORY_CHOICES = [(category.id, category.name) for category in Category.objects.all()]
 
     class Meta:
         model = Product
@@ -19,17 +18,17 @@ class BaseProduct(forms.ModelForm):
     description = forms.CharField(
         widget=forms.Textarea(attrs={'class': 'form-control'})
     )
-    price = forms.IntegerField(
+    price = forms.FloatField(
         widget=forms.NumberInput(attrs={'class': 'form-control'})
     )
-    discount_price = forms.IntegerField(
+    discount_price = forms.FloatField(
         widget=forms.NumberInput(attrs={'class': 'form-control'})
     )
     color = forms.ChoiceField(
         widget=forms.Select(
             attrs={'class': 'form-control'}
         ),
-        choices=ColorChoice
+        choices=ColorChoice.choices
     )
 
     main_image = forms.FileField(
@@ -48,7 +47,7 @@ class BaseProduct(forms.ModelForm):
     brand = forms.ChoiceField(
         widget=forms.Select(
             attrs={'class': 'form-control'}
-        ),choices=BrandChoice
+        ),choices=BrandChoice.choices
 
     )
 

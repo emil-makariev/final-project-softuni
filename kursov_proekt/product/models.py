@@ -1,5 +1,6 @@
 from decimal import Decimal
 from django.core.exceptions import ValidationError
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django.db.models import Max, Sum
 
@@ -28,23 +29,22 @@ class Product(models.Model):
     description = models.TextField(
 
     )
-    price = models.DecimalField(
-        max_digits=10,
-        decimal_places=2
+    price = models.FloatField(
+        validators=
+        [MinValueValidator(1.00), MaxValueValidator(1000.00)]
     )
-    discount_price = models.DecimalField(
-        max_digits=10,
-        decimal_places=2,
-        blank=True,
-        null=True)
-
+    discount_price = models.FloatField(
+        validators=
+        [MinValueValidator(1.00), MaxValueValidator(1000.00)],
+        default=0.00
+    )
     sku = models.CharField(
         max_length=100,
         unique=True
     )
 
     color = models.CharField(
-        choices = ColorChoice
+        choices = ColorChoice.choices
     )
 
     main_image = models.ImageField(
@@ -56,7 +56,7 @@ class Product(models.Model):
     )
 
     brand = models.CharField(
-        choices=BrandChoice
+        choices=BrandChoice.choices
     )
     created_at = models.DateTimeField(
         auto_now_add=True
