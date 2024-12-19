@@ -276,8 +276,19 @@ class ProductDetail(DetailView):
         context = super().get_context_data(**kwargs)
         product = self.object
         category = product.category_id
+        pk_product = product.pk
 
         context['similar_products'] = Product.objects.filter(is_active=True, category=category).exclude(id=product.id)
+        context['pk_product'] = pk_product
+        if self.request.user.is_authenticated:
+            try:
+                wishlist = Wishlist.objects.get(user=self.request.user)
+                wishlist_items = WishlistItem.objects.filter(wishlist=wishlist)
+                context['wishlist_item'] = wishlist_items
+            except Wishlist.DoesNotExist:
+                context['wishlist_item'] = []  # No wishlist found for this user
+        else:
+            context['wishlist_item'] = []  # No wishlist for anonymous users
         return context
 
 

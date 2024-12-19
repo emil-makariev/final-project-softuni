@@ -240,7 +240,6 @@
                                                     {% endif %}
                                                 </li>
                                                  {% if has_perm %}
-                                                    <li><a href=""><img src="{% static 'img/icon/trash-solid.svg' %}" alt=""></a><span>Delete Product</span></li>
                                                     <li><a href="{% url 'edit_product' product.id %}"><img src="{% static 'img/icon/pen-to-square-regular.svg' %}" alt=""></a><span>Edit Product</span></li>
                                                 {% endif %}
 
@@ -274,17 +273,6 @@
                                                     </form>
                                                 </div>
                                             <h5>{{ product.price }}</h5>
-                                            <div class="product__color__select">
-                                                <label for="pc-4">
-                                                    <input type="radio" id="pc-4">
-                                                </label>
-                                                <label class="active black" for="pc-5">
-                                                    <input type="radio" id="pc-5">
-                                                </label>
-                                                <label class="grey" for="pc-6">
-                                                    <input type="radio" id="pc-6">
-                                                </label>
-                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -754,9 +742,7 @@
                                 <a href="/product/product-details/${product.id}">
                                     <img src="${ product.main_image }" alt="${ product.name }">
                                 </a>
-                                    <ul class="product__hover">
-                                        <li><a href=""><img src="{% static 'img/icon/heart.png' %}" alt=""></a><span>Like it</span></li>
-                                    </ul>
+
                                 </div>
 
                                 <div class="product__item__text">
@@ -786,17 +772,7 @@
 
 
                                     <h5>${ product.price }</h5>
-                                    <div class="product__color__select">
-                                        <label for="pc-4">
-                                            <input type="radio" id="pc-4">
-                                        </label>
-                                        <label class="active black" for="pc-5">
-                                            <input type="radio" id="pc-5">
-                                        </label>
-                                        <label class="grey" for="pc-6">
-                                            <input type="radio" id="pc-6">
-                                        </label>
-                                    </div>
+
                                 </div>
                             </div>
                         </div>
