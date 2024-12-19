@@ -1,10 +1,12 @@
+import calendar
+
 from django.contrib.auth import get_user_model, login
 from django.contrib.auth.views import LoginView
 from django.contrib.sites.shortcuts import get_current_site
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
-from django.views.generic import CreateView, TemplateView
+from django.views.generic import CreateView, TemplateView, UpdateView, DetailView
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
@@ -12,7 +14,8 @@ from django.template.loader import render_to_string
 from django.contrib.auth.models import User
 from django.urls import reverse
 
-from kursov_proekt.accounts.forms import BaseUserForm, LoginForm
+from kursov_proekt.accounts.forms import BaseUserForm, LoginForm, ProfileEditForm
+from kursov_proekt.accounts.models import Profile
 from kursov_proekt.settings import EMAIL_HOST_USER
 
 
@@ -90,3 +93,44 @@ class LoginViewCustom(LoginView):
     template_name = 'user/log-in.html'
     form_class = LoginForm
     success_url = reverse_lazy('common')
+
+
+class DetailsProfile(DetailView):
+    template_name = 'user/details-profile.html'
+    model = Profile
+
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # Retrieve the Profile object
+        profile = self.get_object()
+
+        # Check if the Profile object has a related CustomBaseUser
+        if profile.user:  # assuming 'user' is the related field on Profile
+            # Access data_joined from the related user (CustomBaseUser)
+            data_joined = profile.user.data_joined
+            month = data_joined.month
+            year = data_joined.year
+
+            # Convert the numeric month into text using the calendar module
+            month_name = calendar.month_name[month]
+        else:
+            month_name = None
+            year = None
+
+        # Add month name and year to the context
+        context['data_joined_month'] = month_name
+        context['data_joined_year'] = year
+
+        return context
+
+
+
+class EditProfile(UpdateView):
+    template_name = 'user/edit-account.html'
+    success_url = reverse_lazy('common')
+    form_class = ProfileEditForm
+    model = Profile
+
+

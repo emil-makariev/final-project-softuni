@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+    <style>
+        .hidden {
+            display: none;
+        }
+    </style>
+
+<!-- Breadcrumb Section Begin -->
+<section class="breadcrumb-option">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="breadcrumb__text">
+                    <h4>Shopping Cart</h4>
+                    <div class="breadcrumb__links">
+                        <a href="../common/index.html">Home</a>
+                        <a href="../common/shop.html">Shop</a>
+                        <span>Shopping Cart</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Breadcrumb Section End -->
+
+<!-- Shopping Cart Section Begin -->
+<section class="shopping-cart spad">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="shopping__cart__table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Price</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in wishlist_items %}
+                            <tr>
+                                <td class="product__cart__item">
+                                    <div class="product__cart__item__pic">
+                                        <a href="{% url 'detail_product' item.product_id %}">
+                                            <img src="{{ item.product.main_image.url }}" alt="">
+                                        </a>
+
+                                    </div>
+                                    <div class="product__cart__item__text">
+                                        <h6>{{ item.product.name }}</h6>
+                                        Product size is: <h6>{{ item.size_text }}</h6>
+                                        <h5 class="product-price">${{ item.price }}</h5>
+                                    </div>
+                                </td>
+                                 </td>
+                                <td class="cart__price">
+                                    <span class="total-price" id="total-price-{{ item.product.id }}-{{ item.size.id }}">${{ item.product.price|floatformat:2 }}</span>
+                                </td>
+                                <td class="cart__close">
+                                    <i class="fa fa-close" data-item-id="{{ item.id }}"></i>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Намираме всички икони за затваряне
+        const closeButtons = document.querySelectorAll('.cart__close i');
+
+        closeButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const itemId = this.getAttribute('data-item-id'); // Получаваме ID на wishlist item-а
+
+                // Изпращаме AJAX заявка към сървъра, за да премахнем продукта
+                fetch(`/remove_from_wishlist/${itemId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    },
+                    body: JSON.stringify({ 'item_id': itemId })
+                })
+                .then(response => {
+                    if (response.ok) {
+                        // Ако заявката е успешна, премахваме реда от таблицата
+                        this.closest('tr').remove();
+                    } else {
+                        alert('Error removing item from wishlist.');
+                    }
+                });
+            });
+        });
+    });
+</script>
+{% endblock %}

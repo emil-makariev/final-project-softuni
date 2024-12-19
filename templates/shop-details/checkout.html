@@ -8,8 +8,8 @@
                     <div class="breadcrumb__text">
                         <h4>Check Out</h4>
                         <div class="breadcrumb__links">
-                            <a href="../common/index.html">Home</a>
-                            <a href="../common/shop.html">Shop</a>
+                            <a href="{% url 'common' %}">Home</a>
+                            <a href="{% url 'all-products' %}">Shop</a>
                             <span>Check Out</span>
                         </div>
                     </div>
@@ -27,8 +27,6 @@
                     {% csrf_token %}
                     <div class="row">
                         <div class="col-lg-8 col-md-6">
-                            <h6 class="coupon__code"><span class="icon_tag_alt"></span> Have a coupon? <a href="#">Click
-                            here</a> to enter your code</h6>
                             <h6 class="checkout__title">Billing Details</h6>
                             <div class="row">
                                 <div class="col-lg-6">
@@ -78,21 +76,12 @@
                                     </div>
                                 </div>
                             </div>
+{#                            <div class="checkout__input">#}
+{#                                <p>Account Password</p>#}
+{#                                {{ form.account_password }}#}
+{#                            </div>#}
                             <div class="checkout__input">
-                                <p>Account Password</p>
-                                {{ form.account_password }}
-                            </div>
-                            <div class="checkout__input__checkbox">
-                                <label for="diff-acc">
-                                    Note about your order, e.g, special noe for delivery
-                                    <input type="checkbox" id="diff-acc">
-                                    <span class="checkmark"></span>
-                                </label>
-                            </div>
-                            <div class="checkout__input">
-                                {{ form.order_note }}
-                                <input type="text"
-                                placeholder="Notes about your order, e.g. special notes for delivery.">
+                                {{ form.order_notes }}
                             </div>
                         </div>
                         <div class="col-lg-4 col-md-6">

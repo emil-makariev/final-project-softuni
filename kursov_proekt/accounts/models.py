@@ -1,3 +1,4 @@
+from django.utils import timezone
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.models import AbstractUser, PermissionsMixin
 from django.core.validators import MinLengthValidator
@@ -27,7 +28,8 @@ class CustomBaseUser(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(
         unique=True,
         null=False,
-        blank=False
+        blank=False,
+        default=None,
     )
     first_name = models.CharField(
         null=False,
@@ -61,6 +63,10 @@ class CustomBaseUser(AbstractBaseUser, PermissionsMixin):
     )
     site_staff_member = models.BooleanField(
         default=False
+    )
+    data_joined = models.DateTimeField(
+        auto_created=True,
+        default=timezone.now
     )
 
     EMAIL_FIELD = "email"
@@ -120,6 +126,10 @@ class Profile(models.Model):
     )
     receive_promotions = models.BooleanField(
         default=True
+    )
+    description = models.CharField(
+        max_length=700,
+        default='There is no description'
     )
 
     def __str__(self):

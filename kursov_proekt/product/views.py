@@ -1,6 +1,7 @@
 from _decimal import Decimal
 from django.contrib.auth.decorators import permission_required
-from django.http import JsonResponse
+from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.http import JsonResponse, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 from django.template.response import TemplateResponse
 from django.urls import reverse_lazy
@@ -12,14 +13,13 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from kursov_proekt.common.models import Wishlist, WishlistItem
 from kursov_proekt.orders.models import Orders, OrderItems
 from kursov_proekt.orders.serializer import OrderItemsSerializer
-from kursov_proekt.product.forms import CreateProduct, SearchForm
+from kursov_proekt.product.forms import CreateProduct, SearchForm, EditProductForm
 from kursov_proekt.product.models import Product, Category, ProductSize, Accessory
 from kursov_proekt.product.serializers import ProductSerializer
 
-
-# Create your views here.
 
 
 class DashboardProducts(ListView):
@@ -39,7 +39,6 @@ class DashboardProducts(ListView):
         search_param = self.request.GET.get('search_data')
 
         if search_param:
-            print(search_param)
             try:
                 queryset = queryset.filter(name__icontains=search_param)
             except Exception as e:
@@ -81,7 +80,6 @@ class DashboardProducts(ListView):
             try:
                 # Filter products by the size in the related ProductSize model
                 queryset = queryset.filter(sizes__size=size, sizes__stock_quantity__gt=0)
-                print(queryset)
             except Exception as e:
                 print(f"Error occurred: {e}")
 
@@ -92,6 +90,7 @@ class DashboardProducts(ListView):
                 print(f"Error occurred: {e}")
         if size_sort:
             if size_sort == 'Low To High':
+                print('asasasas')
                 queryset = queryset.order_by('price')
             elif size_sort == 'High To Low':
                 queryset = queryset.order_by('-price')
@@ -115,16 +114,32 @@ class DashboardProducts(ListView):
         context['total_clothing'] = len(self.object_list.filter(category__name='clothing'))
         context['total_accessories'] = len(self.object_list.filter(category__name='accessories'))
         context['total_shoes'] = len(self.object_list.filter(category__name='shoes'))
+        context['is_staff'] = self.request.user.has_perm('product.can_create_products')
+
+        if self.request.user.is_authenticated:
+            try:
+                wishlist = Wishlist.objects.get(user=self.request.user)
+                wishlist_items = WishlistItem.objects.filter(wishlist=wishlist)
+                context['wishlist_item'] = wishlist_items
+            except Wishlist.DoesNotExist:
+                context['wishlist_item'] = []  # No wishlist found for this user
+        else:
+            context['wishlist_item'] = []  # No wishlist for anonymous users
+
+        print(context['wishlist_item'])
 
         return context
 
 
-class CreateProducts(CreateView):
+class CreateProducts(PermissionRequiredMixin, CreateView):
     form_class = CreateProduct
     model = Product
     template_name = 'products/create-product.html'
     success_url = reverse_lazy('all-products')
     permission_required = 'product.can_create_products'
+
+    def handle_no_permission(self):
+        return HttpResponseRedirect(reverse_lazy('common'))
 
 
 class UpdateProduct(UpdateView):
@@ -190,15 +205,21 @@ class AddOrderItems(APIView):
         )
 
         if size:
-            size.stock_quantity -= 1
-            size.save()
+            if size.stock_quantity > size.max_size:
+                size.stock_quantity = size.max_size
+            else:
+                size.stock_quantity -= 1
+                size.save()
 
         elif accessory:
-            accessory.stock_quantity -= 1
-            accessory.save()
+            if accessory.stock_quantity > accessory.max_quantity_accessory:
+                accessory.stock_quantity = accessory.max_quantity_accessory
+            else:
+                accessory.stock_quantity -= 1
+                accessory.save()
 
         # Update the total price of the order (Optional, if you need this logic)
-        order.total_price += Decimal(product.price)  # Add product price (you might want to consider quantity)
+        order.total_price += product.price  # Add product price (you might want to consider quantity)
         order.save()
 
         # Return a success response with the created order item data
@@ -259,3 +280,18 @@ class ProductDetail(DetailView):
         context['similar_products'] = Product.objects.filter(is_active=True, category=category).exclude(id=product.id)
         return context
 
+
+class EditProductView(UpdateView):
+    template_name = 'products/edit-product.html'
+    model = Product
+    form_class = EditProductForm
+    success_url = reverse_lazy('common')
+    permission_required = 'product.can_create_products'
+
+    def handle_no_permission(self):
+        return HttpResponseRedirect(reverse_lazy('common'))
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['category_choices'] = Category.objects.all()
+        return context

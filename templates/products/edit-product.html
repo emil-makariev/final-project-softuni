@@ -1,0 +1,129 @@
+{% extends 'base-form-for-creation.html' %}
+{% load placeholder %}
+{% block create-form %}
+    <div class="signup-form">
+        <form action="" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <h2>Edit a product</h2>
+            <p>Edit the details of the product in the app</p>
+            <hr>
+            {{ form.errors }}
+
+            <div class="form-group">
+                {{ form.name|placeholder:"Name of the product" }}
+            </div>
+
+            <div class="form-group">
+                {{ form.description|placeholder:"Product description" }}
+            </div>
+
+            <div class="form-group">
+                {{ form.price|placeholder:"Product price" }}
+            </div>
+
+            <div class="form-group">
+                {{ form.discount_price|placeholder:"Discount price" }}
+            </div>
+
+            <div class="form-group">
+                {{ form.color|placeholder:"Product color" }}
+            </div>
+
+            <div class="form-group">
+                {{ form.sku|placeholder:"SKU" }}
+            </div>
+
+            <div class="form-group">
+                {{ form.main_image|placeholder:"Main image URL" }}
+            </div>
+
+            <!-- Падащо меню за категорията, с единствената избрана категория в момента -->
+            <div class="form-group">
+                <label for="id_category">Category</label>
+                <select name="category" class="form-control" id="id_category" required>
+                    {% if form.category.value == 1 %}
+                        <option value="1" selected>Clothing</option>
+                    {% elif form.category.value == 2 %}
+                        <option value="2" selected>Shoes</option>
+                    {% elif form.category.value == 3 %}
+                        <option value="3" selected>Accessories</option>
+                    {% endif %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                {{ form.brand|placeholder:"Brand name" }}
+            </div>
+
+            <!-- Полета за количество на размери, които ще се показват/скриват динамично -->
+            <div id="clothing-sizes" style="display: none;">
+                <div class="form-group">
+                    Enter Quantity for XS product: {{ form.xs_quantity }}
+                </div>
+                <div class="form-group">
+                    Enter Quantity for S product: {{ form.s_quantity }}
+                </div>
+                <div class="form-group">
+                    Enter Quantity for M product: {{ form.m_quantity }}
+                </div>
+                <div class="form-group">
+                    Enter Quantity for L product: {{ form.l_quantity }}
+                </div>
+                <div class="form-group">
+                    Enter Quantity for XL product: {{ form.xl_quantity }}
+                </div>
+            </div>
+
+            <div id="shoe-sizes" style="display: none;">
+                <div class="form-group">
+                    Enter Quantity for size 36 product: {{ form.size_36_quantity }}
+                </div>
+                <div class="form-group">
+                    Enter Quantity for size 37 product: {{ form.size_37_quantity }}
+                </div>
+                <div class="form-group">
+                    Enter Quantity for size 38 product: {{ form.size_38_quantity }}
+                </div>
+                <div class="form-group">
+                    Enter Quantity for size 39 product: {{ form.size_39_quantity }}
+                </div>
+                <div class="form-group">
+                    Enter Quantity for size 40 product: {{ form.size_40_quantity }}
+                </div>
+            </div>
+
+            <div id="accessory-fields" style="display: none;">
+                <div class="form-group">
+                    Enter Quantity for accessory product: {{ form.accessory_quantity }}
+                </div>
+            </div>
+
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary btn-lg">Edit the product</button>
+            </div>
+        </form>
+    </div>
+
+    <script type="text/javascript">
+        document.addEventListener('DOMContentLoaded', function () {
+            const categorySelect = document.getElementById('id_category');
+
+            // Избиране на съответното поле за количество в зависимост от категорията
+            const categorySelectValue = '{{ form.category.value }}';
+
+            if (categorySelectValue == '1') {
+                document.getElementById('clothing-sizes').style.display = 'block';
+                document.getElementById('shoe-sizes').style.display = 'none';
+                document.getElementById('accessory-fields').style.display = 'none';
+            } else if (categorySelectValue == '2') {
+                document.getElementById('shoe-sizes').style.display = 'block';
+                document.getElementById('clothing-sizes').style.display = 'none';
+                document.getElementById('accessory-fields').style.display = 'none';
+            } else if (categorySelectValue == '3') {
+                document.getElementById('accessory-fields').style.display = 'block';
+                document.getElementById('clothing-sizes').style.display = 'none';
+                document.getElementById('shoe-sizes').style.display = 'none';
+            }
+        });
+    </script>
+{% endblock %}

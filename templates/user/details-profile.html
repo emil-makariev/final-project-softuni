@@ -1,0 +1,196 @@
+{% load static %}
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Snippet - BBBootstrap</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Font Awesome CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+
+    <!-- jQuery -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+    <style>
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        /* Track */
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        /* Handle */
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+        }
+
+        /* Handle on hover */
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        /* General Styling */
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: #f0ecec;
+        }
+
+        .card {
+            width: 350px;
+            background-color: #f7f7f7;
+            border: none;
+            cursor: pointer;
+            transition: all 0.5s;
+        }
+
+        .image img {
+            transition: all 0.5s;
+        }
+
+        .card:hover .image img {
+            transform: scale(1.5);
+        }
+
+        .btn {
+            height: 140px;
+            width: 140px;
+            border-radius: 50%;
+        }
+
+        .name {
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        .idd {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .idd1 {
+            font-size: 12px;
+        }
+
+        .number {
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        .follow {
+            font-size: 12px;
+            font-weight: 500;
+            color: #444444;
+        }
+
+        .btn1 {
+            height: 40px;
+            width: 150px;
+            border: none;
+            background-color: #000;
+            color: #aeaeae;
+            font-size: 15px;
+        }
+
+        .text span {
+            font-size: 13px;
+            color: #545454;
+            font-weight: 500;
+        }
+
+        .icons i {
+            font-size: 19px;
+        }
+
+        .hr .new1 {
+            border: 1px solid;
+        }
+
+        .join {
+            font-size: 14px;
+            color: #a0a0a0;
+            font-weight: bold;
+        }
+
+        .date {
+            background-color: #ccc;
+        }
+
+    </style>
+</head>
+
+<body class="snippet-body">
+
+    <div class="container mt-4 mb-4 p-3 d-flex justify-content-center">
+        <div class="card p-4">
+            <div class="image d-flex flex-column justify-content-center align-items-center">
+                <button class="btn btn-secondary">
+                    {% if object.profile_picture %}
+                        <img src="{{ object.profile_picture.url }}" height="100" width="100" />
+                    {% else %}
+                        <img src="{% static 'img/Default_pfp.svg.png' %}" height="100" width="100" />
+                    {% endif %}
+                </button>
+
+                <span class="name mt-3">{{ object.user.first_name }} {{ object.user.last_name }}</span>
+                <span class="idd">{{ object.user.email }}</span>
+                <div class="d-flex flex-row justify-content-center align-items-center gap-2">
+                </div>
+
+                    <div class="d-flex mt-2">
+                        <a href="{% url 'edit-profile' view.request.user.id %}" class="btn1 btn-dark text-center">Edit Profile</a>
+                    </div>
+                <div class="text mt-3">
+                    {% if object.city and object.country %}
+                        <span>City:{{ object.city }} / Country: {{ object.country }}</span>
+                    {% else %}
+                        <span>City: Not Chosen / Country: Not Chosen</span>
+                    {% endif %}
+                </div>
+                <div class="text mt-3">
+                        <span>{{ object.description }}</span>
+                    </div>
+                <div class="gap-3 mt-3 icons d-flex flex-row justify-content-center align-items-center">
+                    <span><i class="fa fa-twitter"></i></span>
+                    <span><i class="fa fa-facebook-f"></i></span>
+                    <span><i class="fa fa-instagram"></i></span>
+                    <span><i class="fa fa-linkedin"></i></span>
+                </div>
+                <div class="px-2 rounded mt-4 date">
+                    <span class="join">Joined {{ data_joined_month }}, {{ data_joined_year }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <a href="{% url 'common' %}" style="display: block; text-align: center; margin-top: 20px;">Back to the home page</a>
+
+    <!-- Bootstrap JS -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Placeholder for future scripts -->
+    <script type="text/javascript" src="#"></script>
+    <script type="text/javascript" src="#"></script>
+    <script type="text/javascript" src="#"></script>
+
+    <!-- Prevent default link action -->
+    <script type="text/javascript">
+        var myLink = document.querySelector('a[href="#"]');
+        myLink.addEventListener('click', function (e) {
+            e.preventDefault();
+        });
+    </script>
+</body>
+
+</html>

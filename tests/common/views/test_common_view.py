@@ -1,113 +1,80 @@
-import shutil
-
-from django.contrib.auth import get_user_model
-from django.contrib.auth.models import Permission
-from django.core.files.storage import FileSystemStorage
-from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.urls import reverse
+from django.contrib.auth import get_user_model  # Use this to get the custom user model
+from django.contrib.contenttypes.models import ContentType
 from kursov_proekt.product.models import Product, Category
-from django.utils import timezone
-
-from kursov_proekt.settings import MEDIA_ROOT
+from django.contrib.auth.models import Permission, Group
 
 
-class HomePageTest(TestCase):
-
+class HomePageViewTest(TestCase):
     def setUp(self):
-        # Create a category to associate with the product
-        self.category = Category.objects.create(name="Category 1")
+        # Use the custom user model instead of the default User model
+        User = get_user_model()
+        self.user = User.objects.create_user(username='testuser', password='password123')
 
-        # Create a user without permission (assuming you are also testing user permissions)
-        self.user_without_perm = get_user_model().objects.create_user(
-            username='user_without_perm',
-            email='user_without_perm@example.com',  # Provide a valid email
-            password='password123'
-        )
+        # Create the permission and group for the user
+        self.product_permission = Permission.objects.get(codename='can_create_products')
+        self.group = Group.objects.create(name='Product Managers')
+        self.group.permissions.add(self.product_permission)
+        self.user.groups.add(self.group)
+        self.user.save()
 
-        # Create a user with permission
-        self.user_with_perm = get_user_model().objects.create_user(
-            username='user_with_perm',
-            email='user_with_perm@example.com',  # Provide a valid email
-            password='password123'
-        )
+        # Create categories
+        self.category1 = Category.objects.create(name='Electronics')
+        self.category2 = Category.objects.create(name='Clothing')
 
-        # Create a product and associate it with the category
-        self.product = Product.objects.create(
-            name="Product 1",
-            price=100,
-            num_of_times_purchased=6,
-            created_at=timezone.now(),
-            category=self.category  # Associate with the category
-        )
+        # Create test products with all required fields, including category, price, and unique SKU
+        self.product1 = Product.objects.create(name='Best Seller 1', num_of_times_purchased=10, created_at='2023-01-01',
+                                               price=100, category=self.category1, sku='SKU001')
+        self.product2 = Product.objects.create(name='Best Seller 2', num_of_times_purchased=15, created_at='2023-02-01',
+                                               price=150, category=self.category1, sku='SKU002')
+        self.product3 = Product.objects.create(name='Best Seller 3', num_of_times_purchased=20, created_at='2023-03-01',
+                                               price=200, category=self.category2, sku='SKU003')
+        self.product4 = Product.objects.create(name='New Arrival 1', num_of_times_purchased=1, created_at='2023-12-01',
+                                               price=50, category=self.category2, sku='SKU004')
+        self.product5 = Product.objects.create(name='New Arrival 2', num_of_times_purchased=1, created_at='2023-12-10',
+                                               price=75, category=self.category1, sku='SKU005')
+        self.product6 = Product.objects.create(name='New Arrival 3', num_of_times_purchased=1, created_at='2023-12-15',
+                                               price=80, category=self.category1, sku='SKU006')
 
-    def test_home_page_with_permissions(self):
-        # Set up temporary file storage
-        fs = FileSystemStorage(location='/tmp')  # or a suitable temporary directory
+        # Log in the user
+        self.client.login(username='testuser', password='password123')
 
-        # Create an image file in memory for testing
-        image = SimpleUploadedFile("test_image.jpg", b"file_content", content_type="image/jpeg")
-
-        # Create a category for the product
-        category = Category.objects.create(name="Test Category")
-
-        # Ensure sku is provided and unique
-        sku_value = "SKU12345"
-
-        # Create the Product with the main_image field set to the uploaded image
-        instance = Product.objects.create(
-            name="Product with Image",
-            price=50,
-            num_of_times_purchased=10,
-            created_at=timezone.now(),
-            category=category,
-            main_image=image,
-            sku=sku_value
-        )
-
-        # Make a GET request to the home page with permissions
-        self.client.login(username='user_with_perm', password='password123')
+    def test_homepage_status_code(self):
+        # Check that the page returns a 200 status code
         response = self.client.get(reverse('common'))
-
-        # Check the response status and other assertions
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'common/index.html')
+
+    def test_context_data_best_sellers(self):
+        # Check that the context contains 'best_sellers' with the correct products
+        response = self.client.get(reverse('common'))
+        best_sellers = response.context['best_sellers']
+        self.assertEqual(len(best_sellers), 3)
+        self.assertEqual(best_sellers[0], self.product3)  # The product with the highest purchases
+        self.assertEqual(best_sellers[1], self.product2)
+        self.assertEqual(best_sellers[2], self.product1)
+
+    def test_context_data_new_arrivals(self):
+        # Check that the context contains 'new_arrivals' with the correct products
+        response = self.client.get(reverse('common'))
+        new_arrivals = response.context['new_arrivals']
+        self.assertEqual(len(new_arrivals), 3)
+        self.assertEqual(new_arrivals[0], self.product6)  # The most recent product
+        self.assertEqual(new_arrivals[1], self.product5)
+        self.assertEqual(new_arrivals[2], self.product4)
+
+    def test_user_permission_in_context(self):
+        # Check if the user has the correct permission in the context
+        response = self.client.get(reverse('common'))
         self.assertTrue(response.context['has_perm'])
 
-        # Check that 'best_sellers' and 'new_arrivals' have correct data
-        best_sellers = response.context['best_sellers']
-        self.assertEqual(len(best_sellers), 3)
-        self.assertTrue(all(product.num_of_times_purchased > 5 for product in best_sellers))
-
-        new_arrivals = response.context['new_arrivals']
-        self.assertEqual(len(new_arrivals), 3)
-        self.assertTrue(all(product.created_at >= new_arrivals[-1].created_at for product in new_arrivals))
-
-    def tearDown(self):
-        shutil.rmtree(MEDIA_ROOT)
-
-    def test_home_page_without_permissions(self):
-        # Log in the user without permissions
-        self.client.login(username='user_without_perm', password='password123')
-
-        # Request the home page
+    def test_user_without_permission(self):
+        # Test for a user without the 'product.can_create_products' permission
+        user_without_permission = get_user_model().objects.create_user(
+            username='user_without_permission',
+            email='user_without_permission@example.com',  # Provide a unique email
+            password='password123'
+        )
+        self.client.login(username='user_without_permission', password='password123')
         response = self.client.get(reverse('common'))
-
-        # Check that the response status is OK (200)
-        self.assertEqual(response.status_code, 200)
-
-        # Check that the correct template is used
-        self.assertTemplateUsed(response, 'common/index.html')
-
-        # Check the 'has_perm' context variable (should be False)
         self.assertFalse(response.context['has_perm'])
-
-        # Check the 'best_sellers' context variable (should contain 3 products with num_of_times_purchased > 5)
-        best_sellers = response.context['best_sellers']
-        self.assertEqual(len(best_sellers), 3)
-        self.assertTrue(all(product.num_of_times_purchased > 5 for product in best_sellers))
-
-        # Check the 'new_arrivals' context variable (should contain the most recent 3 products)
-        new_arrivals = response.context['new_arrivals']
-        self.assertEqual(len(new_arrivals), 3)
-        self.assertTrue(all(product.created_at >= new_arrivals[-1].created_at for product in new_arrivals))

@@ -12,6 +12,7 @@ from kursov_proekt.product.choices import ColorChoice, BrandChoice, SizeChoiceSh
 
 
 class Category(models.Model):
+
     name = models.CharField(
         max_length=100
     )
@@ -21,6 +22,11 @@ class Category(models.Model):
 
 
 class Product(models.Model):
+
+    class Meta:
+        permissions = [
+            ('can_create_products', 'Can create products')
+        ]
 
     name = models.CharField(
         max_length=255,
@@ -48,7 +54,8 @@ class Product(models.Model):
     )
 
     main_image = models.ImageField(
-        upload_to='mediafiles/'
+        upload_to='mediafiles/',
+        default='default_image.jpg'
     )
     category = models.ForeignKey(
         to=Category,
@@ -71,14 +78,11 @@ class Product(models.Model):
         default=0
     )
 
-    class Meta:
-        permissions = [
-            ('can_create_products', 'Can create products')
-        ]
+
 
     def get_discounted_price(self):
         # Конвертирайте в Decimal
-        return Decimal(self.discount_price) if self.discount_price else Decimal(self.price)
+        return self.discount_price if self.discount_price else self.price
 
     def get_max_stock_quantity(self):
         # Използваме Sum за да вземем общото количество на всички размери

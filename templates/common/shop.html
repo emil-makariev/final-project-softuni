@@ -38,7 +38,7 @@
                     <div class="breadcrumb__text">
                         <h4>Shop</h4>
                         <div class="breadcrumb__links">
-                            <a href="index.html">Home</a>
+                            <a href="{% url 'common' %}">Home</a>
                             <span>Shop</span>
                         </div>
                     </div>
@@ -179,24 +179,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="card">
-                                    <div class="card-heading">
-                                        <a data-toggle="collapse" data-target="#collapseSix">Tags</a>
-                                    </div>
-                                    <div id="collapseSix" class="collapse show" data-parent="#accordionExample">
-                                        <div class="card-body">
-                                            <div class="shop__sidebar__tags">
-                                                <a href="#">Product</a>
-                                                <a href="#">Bags</a>
-                                                <a href="#">Shoes</a>
-                                                <a href="#">Fashio</a>
-                                                <a href="#">Clothing</a>
-                                                <a href="#">Hats</a>
-                                                <a href="#">Accessories</a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+
                             </div>
                         </div>
                     </div>
@@ -221,12 +204,7 @@
                             </div>
                             <div class="col-lg-6 col-md-6 col-sm-6">
                                 <div class="shop__product__option__right">
-                                    <p>Sort by Price:</p>
-                                    <select>
-                                        <option class="price-sort" data-value="LtH">None</option>
-                                        <option class="price-sort" data-value="LtH">Low To High</option>
-                                        <option class="price-sort" data-value="HtL">High To Low</option>
-                                    </select>
+
                                 </div>
                             </div>
                         </div>
@@ -241,7 +219,32 @@
                                             </a>
 
                                             <ul class="product__hover">
-                                                <li><a href=""><img src="{% static 'img/icon/heart.png' %}" alt=""></a><span>Like it</span></li>
+                                                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+                                                <li  class="wishlist-item" data-product-id="{{ product.id }}" >
+                                                    <a href="javascript:void(0);" class="add-to-wishlist">
+                                                    {% if request.user.is_authenticated %}
+
+                                                        {% for el in wishlist_item %}
+                                                            {% if product.id == el.product_id %}
+                                                                <img src="{% static 'img/icon/heart-solid-svgrepo-com(1).svg' %}" alt="">
+                                                            {% else %}
+                                                                <img src="{% static 'img/icon/heart.png' %}" alt="">
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                        {% if not wishlist_item %}
+                                                            <img src="{% static 'img/icon/heart.png' %}" alt="">
+
+                                                        {% endif %}
+                                                        </a>
+                                                        <span>Like it</span>
+                                                    {% endif %}
+                                                </li>
+                                                 {% if has_perm %}
+                                                    <li><a href=""><img src="{% static 'img/icon/trash-solid.svg' %}" alt=""></a><span>Delete Product</span></li>
+                                                    <li><a href="{% url 'edit_product' product.id %}"><img src="{% static 'img/icon/pen-to-square-regular.svg' %}" alt=""></a><span>Edit Product</span></li>
+                                                {% endif %}
+
+
                                             </ul>
                                         </div>
 
@@ -329,8 +332,62 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <script>
+        document.addEventListener("DOMContentLoaded", function() {
+        const wishlistButtons = document.querySelectorAll('.add-to-wishlist');
 
-            var closeButton = document.querySelector('.icon_close');
+        wishlistButtons.forEach(function(button) {
+            button.addEventListener('click', function(event) {
+                event.preventDefault();
+
+                const productId = this.closest('.wishlist-item').getAttribute('data-product-id');
+                const heartIcon = this.querySelector('img'); // Вземаме иконата на сърцето
+
+                // Изпращаме POST/DELETE заявка за добавяне/премахване на продукта от wishlist
+                fetch(`/api/toggle-wishlist/${productId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Променяме иконата на сърцето в зависимост от резултата
+                    if (data.message === 'Product added to wishlist') {
+                        heartIcon.src = "{% static 'img/icon/heart-solid-svgrepo-com(1).svg' %}";
+                        console.log(heartIcon)
+                        console.log('Product added to wishlist')
+                    } else if (data.message === 'Product removed from wishlist') {
+                        heartIcon.src = "{% static 'img/icon/heart.png' %}";
+                        console.log(heartIcon)
+                        console.log('Product removed from wishlist')
+
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while toggling the wishlist.');
+                });
+            });
+        });
+    });
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+        var closeButton = document.querySelector('.icon_close');
 
         // Add click event listener
         closeButton.addEventListener('click', function() {
@@ -527,7 +584,7 @@
 
 
 
-        $(document).ready(function(){
+           $(document).ready(function(){
             $(".category-filter, .brand-filter, .price-filter, .size-filter, .color-filter, .price-sort").click(function(e){
                 e.preventDefault();
 
@@ -747,7 +804,6 @@
                     $('#filtered-products').append(productHTML);
                 });
 
-                // Handle the "Add to Cart" button click
                 $('.add-cart').click(function(event) {
                     event.preventDefault();  // Prevent default action
 

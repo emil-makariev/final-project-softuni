@@ -9,6 +9,6 @@ urlpatterns = (
     path('update-cart-total/', views.update_cart_total, name='update_cart_total'),
     path('check-out/<int:pk>/', views.FinalizeOrder.as_view(), name='check_out'),
     path('remove-product-from-order/', views.remove_product_from_order, name='remove'),
-    path('after-purchesing/', views.after, name='after_purchesing')
+    path('after-purchesing/', views.after, name='after_purchesing'),
     # http://127.0.0.1:8000/carts/40/add-to-order/
 )

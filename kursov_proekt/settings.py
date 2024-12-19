@@ -31,7 +31,6 @@ SECRET_KEY = 'django-insecure-hc*7)m_afm$wb8wt0*e)5+m7pvj9^me9s-w@pr8(d&^hg1o5^l
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -113,14 +112,14 @@ DATABASES = {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     },
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": "project-last",
-        "USER": "postgres-user",
-        "PASSWORD": "password",
-        "HOST": "127.0.0.1",
-        "PORT": "5432",
-    },
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('POSTGRES_DB', 'neondb'),
+        'USER': os.getenv('POSTGRES_USER', 'neondb_owner'),
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'PWKAdh2i6gVv'),
+        'HOST': os.getenv('POSTGRES_HOST', 'ep-bitter-moon-a5yi73ea.us-east-2.aws.neon.tech'),
+        'PORT': os.getenv('POSTGRES_PORT', '5432'),
+    }
 }
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',

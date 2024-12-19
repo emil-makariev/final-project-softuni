@@ -2,16 +2,27 @@ import json
 from decimal import Decimal
 from collections import defaultdict
 
-from django.shortcuts import get_object_or_404, render
+from django.contrib.auth import get_user_model
+from django.contrib.auth.tokens import default_token_generator
+from django.contrib.sites.shortcuts import get_current_site
+from django.db import transaction
+from django.shortcuts import get_object_or_404, render, redirect
+from django.template.loader import render_to_string
 from django.urls import reverse_lazy
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.views.generic import ListView, DetailView, FormView
 from rest_framework.permissions import IsAuthenticated
-
+import asyncio
+from django.core.mail import send_mail
+from asgiref.sync import sync_to_async
+from django.http import HttpResponse, Http404
 
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.response import Response
 
+from kursov_proekt import settings
+from kursov_proekt.accounts.models import CustomBaseUser
 from kursov_proekt.orders.forms import BillingDetailsForm
 from kursov_proekt.orders.models import OrderItems, Orders
 from django.contrib.auth.decorators import login_required
@@ -34,41 +45,88 @@ class DashboardProductCarts(ListView):
         order_items = OrderItems.objects.filter(order__in=valid_orders)
 
         product_count = defaultdict(int)
+        order_items_quantity = {}
 
         # Group products by product and size, and calculate the total quantity for each group
         for item in order_items:
             product = item.product
             size = item.size
+            if size:
+                product_key = (product, size.size)
+
+                if product_key in order_items_quantity:
+                    order_items_quantity[product_key] += 1
+                else:
+                    order_items_quantity[product_key] = 1
+            elif product.accessory:
+                if product in order_items_quantity:
+                    order_items_quantity[product] += 1
+                else:
+                    order_items_quantity[product] = 1
+
             product_count[(product, size)] += 1
 
         product_data = []
 
         # For each product-size combination, get the total price and max stock quantity
         for (product, size), total_quantity in product_count.items():
-            total_price = product.price * total_quantity
-            # Check if size is None, and set max_quantity accordingly
             if size:
-                max_quantity = size.max_size  # Assuming you have stock_quantity in ProductSize
+                # Получаваме максималното количество от продукта за този размер
+                max_quantity = size.max_size
             else:
-                max_quantity = 0  # You can set a default value if size is None
+                max_quantity = product.accessory.max_quantity_accessory
 
-            price_for_a_singe_product = product.price
+            # Проверяваме дали има излишък
+            if total_quantity > max_quantity:
+                # Изчисляваме излишните количества
+                excess_quantity = total_quantity - max_quantity
 
-            product_data.append({
-                'product': product,
-                'size': size,
-                'count': total_quantity,
-                'size_text': size.size if size else 'No Size',  # Display 'No Size' if size is None
-                'total_price': total_price,
-                'max_quantity': max_quantity,  # Add max_quantity to the data
-                'price_for_a_singe_product': price_for_a_singe_product,
-            })
-            print(product.id)
+
+                # Поставяме в данните новото количество, което е равнo на max_quantity
+                product_data.append({
+                    'product': product,
+                    'size': size,
+                    'count': max_quantity,  # Слагаме само допустимото количество
+                    'size_text': size.size if size else 'No Size',
+                    'total_price': product.price * max_quantity,  # Обновяваме цената
+                    'max_quantity': max_quantity,
+                    'price_for_a_singe_product': product.price,
+                })
+
+                if total_quantity > max_quantity:
+                    if size:
+                        size.stock_quantity = 0
+                        size.save()
+                    else:
+                        product.accessory.stock_quantity = 0
+                        product.accessory.save()
+
+                # Изтриваме само излишните продукти от количката
+                excess_items = OrderItems.objects.filter(order__in=valid_orders, product=product, size=size)
+
+                # Премахваме излишните продукти (които надвишават максималното количество)
+                excess_items_to_delete = excess_items[:excess_quantity]
+
+                for item in excess_items_to_delete:
+                    item.delete()
+
+            else:
+                # Ако количеството не надвишава максималното, добавяме в данните без промени
+                product_data.append({
+                    'product': product,
+                    'size': size,
+                    'count': total_quantity,
+                    'size_text': size.size if size else 'No Size',
+                    'total_price': product.price * total_quantity,
+                    'max_quantity': max_quantity,
+                    'price_for_a_singe_product': product.price,
+                })
 
         context['product_data'] = product_data
         context['user_id'] = self.request.user.id
 
         return context
+
 
 
 @csrf_exempt
@@ -284,7 +342,7 @@ def update_cart_total(request):
         # Get the user's order which is in progress
         order = Orders.objects.get(profile=request.user.profile, status=False)
 
-        total_price = 0
+        total_price = 0.00
 
         # Loop through all the order items and check if the size is valid
         for item in order.orders.all():
@@ -293,11 +351,12 @@ def update_cart_total(request):
             else:
                 total_price += item.product.price * (item.accessory.max_quantity_accessory - item.accessory.stock_quantity)
 
-        print(total_price)
+
+
 
         return JsonResponse({
             'status': 'success',
-            'total_price': total_price
+            'total_price': float(total_price)
         })
     else:
         return JsonResponse({'status': 'error', 'message': 'User not authenticated'})
@@ -363,51 +422,39 @@ def remove_product_from_order(request):
 class FinalizeOrder(FormView):
     template_name = 'shop-details/checkout.html'
     form_class = BillingDetailsForm
-    success_url = reverse_lazy('after_purchesing')
+    success_url = reverse_lazy('after_purchesing')  # Променете success_url на 'after', ако искате да пренасочвате към 'after-purchasing'
 
     def get_context_data(self, **kwargs):
         total_price_for_same_products = 0
         pk = self.kwargs['pk']
-        order = get_object_or_404(Orders, profile__pk=pk, status=False)
+        try:
+            # Проверете дали поръчката съществува
+            order = Orders.objects.get(profile__pk=pk, status=False)
+        except Orders.DoesNotExist:
+            return redirect(self.success_url)  # Пренасочваме към success_url, ако поръчката не съществува
 
-        # Вземаме всички OrderItems за поръчката
+        # Fetch all order items
         order_items = OrderItems.objects.filter(order=order)
 
-        # Събиране на групираните продукти по категория и размер
-        grouped_items = {}
+        # Group products by category and size
+        grouped_items = defaultdict(lambda: defaultdict(lambda: {'quantity': 0, 'total_price': 0.00}))
+
         for item in order_items:
             product = item.product
             size = item.size
             accessory = item.accessory
             category = product.category.name.lower()
 
-            if category not in grouped_items:
-                grouped_items[category] = {}
-
             if size:
-                if size not in grouped_items:
-                    if size not in grouped_items[category]:
-                        grouped_items[category][size] = {
-                            'product': product,
-                            'quantity': 0,
-                            'total_price': Decimal('0.00')
-                        }
+                grouped_items[category][size]['product'] = product
                 grouped_items[category][size]['quantity'] += 1
-                grouped_items[category][size]['total_price'] = product.price
+                grouped_items[category][size]['total_price'] += product.price
                 total_price_for_same_products += product.price
 
             if accessory:
-                if accessory.product.name not in grouped_items[category]:
-                    grouped_items[category][product.name] = {
-                        'product': product,
-                        'quantity': 0,
-                        'total_price': Decimal('0.00'),
-                        'type': 'accessory'
-                    }
-
-
+                grouped_items[category][product.name]['product'] = product
                 grouped_items[category][product.name]['quantity'] += 1
-                grouped_items[category][product.name]['total_price'] = product.price
+                grouped_items[category][product.name]['total_price'] += product.price
                 total_price_for_same_products += product.price
 
         order.total_price = total_price_for_same_products
@@ -422,35 +469,38 @@ class FinalizeOrder(FormView):
     def form_valid(self, form):
         # Get the order using the 'pk' from kwargs
         pk = self.kwargs['pk']
-        order = get_object_or_404(Orders, profile__pk=pk, status=False)
+        try:
+            order = Orders.objects.get(profile__pk=pk, status=False)
+        except Orders.DoesNotExist:
+            return redirect(self.success_url)  # Пренасочваме към success_url, ако поръчката не съществува
 
-        # Актуализиране на num_of_times_purchased за всеки продукт в поръчката
+        # Update product purchase counts and stock
         for order_item in order.orders.all():
             product = order_item.product
             product.num_of_times_purchased += 1
 
             if product.sizes.exists():
                 if product.sizes.all().count() > 0:
-                    # Проверка дали всички размери на продукта имат stock_quantity == 0
+                    # Check if all sizes are out of stock
                     all_sizes_out_of_stock = product.sizes.all().filter(stock_quantity__gt=0).count() == 0
-
-                    # Ако всички размери са извън наличност, задаваме is_active = False
                     if all_sizes_out_of_stock:
                         product.is_active = False
                         product.save()
+                    # product.sizes.max_quantity -=
 
             else:
                 if product.accessory.stock_quantity <= 0:
                     product.accessory.stock_quantity = 0
                     product.is_active = False
                     product.save()
+                # product.accessory.max_quantity_accessory -=
 
-        # Премахваме всички OrderItem-и за поръчката
+        # Set the order as complete
         order.status = True
         order.save()
         order.orders.all().delete()
 
-        # Пренасочваме към success страница
+        # Save the form with the order_id
         form = form.save(commit=False)
         form.order_id = order.id
         form.save()

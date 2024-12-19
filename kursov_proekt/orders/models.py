@@ -1,3 +1,4 @@
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 
 from kursov_proekt.accounts.models import Profile
@@ -12,19 +13,19 @@ class Orders(models.Model):
     updated_at = models.DateTimeField(
         auto_now=True
     )
-    total_price = models.DecimalField(
-        max_digits=10,
-        decimal_places=2,
-        default=0.0
+    total_price = models.FloatField(
+        validators=
+        [MinValueValidator(0.00), MaxValueValidator(1000.00)],
+        default=0.00
+
     )
 
     discount_codes = models.CharField(
         max_length=50, blank=True, null=True,
     )
-    discount_amount = models.DecimalField(
-        max_digits=10,
-        decimal_places=2,
-        default=0.0,
+    discount_amount = models.FloatField(
+        validators=
+        [MinValueValidator(1.00), MaxValueValidator(1000.00)],
         null=True,
         blank=True,
     )
@@ -71,7 +72,6 @@ class BillingDetails(models.Model):
         max_length=100
     )
     email = models.EmailField(
-        max_length=20
     )
     phone_number = models.CharField(
         max_length=20
@@ -87,9 +87,6 @@ class BillingDetails(models.Model):
     )
     country = models.CharField(
         max_length=100
-    )
-    account_password = models.CharField(
-        max_length=20,
     )
     order_notes = models.CharField(
         max_length=500,

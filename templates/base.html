@@ -28,6 +28,7 @@
     <link rel="stylesheet" href="{% static 'css/color-buttons.css' %}" type="text/css">
     <link rel="stylesheet" href="{% static 'css/button.css' %}" type="text/css">
 
+
 </head>
 
 <body>
@@ -41,23 +42,28 @@
     <div class="offcanvas-menu-wrapper">
         <div class="offcanvas__option">
             <div class="offcanvas__links">
-                <a href="#">Sign in</a>
-                <a href="#">FAQs</a>
+                {% if user_logged_in  %}
+                                    <a href="{% url 'log-out' %}" onclick="event.preventDefault(); document.getElementById('logout_form').submit()" class="menu-link">
+                                            Log out
+                                    </a>
+                                    {% if has_perm %}
+                                        <a href="{% url 'create-product' %}">
+                                            Create Product
+                                        </a>
+                                    {% endif %}
+                                    <form id="logout_form" method="post" action="{% url 'log-out' %}" style="display: none;">
+                                        {% csrf_token %}
+                                    </form>
+                                {% else %}
+                                    <a href="{% url 'log-in' %}">Sign in</a>
+                                {% endif %}
             </div>
-            <div class="offcanvas__top__hover">
-                <span>Usd <i class="arrow_carrot-down"></i></span>
-                <ul>
-                    <li>USD</li>
-                    <li>EUR</li>
-                    <li>USD</li>
-                </ul>
-            </div>
+
         </div>
         <div class="offcanvas__nav__option">
-            <a href="#" class="search-switch"><img src="{% static 'img/icon/search.png' %}" alt=""></a>
-            <a href="#"><img src="{% static 'img/icon/heart.png' %}" alt=""></a>
-            <a href="#"><img src="{% static 'img/icon/cart.png' %}" alt=""> <span>0</span></a>
-            <div class="price">$0.00</div>
+            {% if user_logged_in %}
+                <a href="{% url 'product-wishlist' view.request.user.id   %}"><img src="{% static 'img/icon/heart.png' %}" alt=""></a>
+            {% endif %}
         </div>
         <div id="mobile-menu-wrap"></div>
         <div class="offcanvas__text">
@@ -94,15 +100,9 @@
                                 {% else %}
                                     <a href="{% url 'log-in' %}">Sign in</a>
                                 {% endif %}
-                                <a href="#">FAQs</a>
                             </div>
                             <div class="header__top__hover">
-                                <span>Usd <i class="arrow_carrot-down"></i></span>
-                                <ul>
-                                    <li>USD</li>
-                                    <li>EUR</li>
-                                    <li>USD</li>
-                                </ul>
+
                             </div>
                         </div>
                     </div>
@@ -123,26 +123,29 @@
                             <li class="nav-item {% if request.path == '/product/all-products/' %}active {% endif %}"><a href="{% url 'all-products' %}">Shop</a></li>
                             <li><a href="#">Pages</a>
                                 <ul class="dropdown">
-                                    <li><a href="shop-info/about.html">About Us</a></li>
+                                    <li><a href="{% url 'about-us' %}">About Us</a></li>
                                     <li><a href="shop-details/shop-details.html">Shop Details</a></li>
                                     {% if user_logged_in %}
                                         <li><a href="{% url 'all-products-carts' view.request.user.id  %}">Shopping Cart</a></li>
                                         <li><a href="{% url 'check_out' view.request.user.id%}">Check Out</a></li>
                                     {% endif %}
-                                    <li><a href="blog/blog-details.html">Blog Details</a></li>
                                 </ul>
                             </li>
-                            <li><a href="blog/blog.html">Blog</a></li>
-                            <li><a href="shop-details/contact.html">Contacts</a></li>
+                            <li><a href="{% url 'contacts' %}">Contacts</a></li>
                         </ul>
                     </nav>
                 </div>
                 <div class="col-lg-3 col-md-3">
                     <div class="header__nav__option">
-                        <a href="#" class="search-switch"><img src="{% static 'img/icon/search.png' %}" alt=""></a>
-                        <a href="#"><img src="{% static 'img/icon/heart.png' %}" alt=""></a>
-                        <a href="#"><img src="{% static 'img/icon/cart.png' %}" alt=""> <span>0</span></a>
-                        <div class="price">$0.00</div>
+                        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+
+
+                        {% if user_logged_in %}
+                        <a href="{% url 'product-wishlist' view.request.user.id   %}"><img src="{% static 'img/icon/heart.png' %}" alt=""></a>
+                        <a href="{% url 'details-profile' view.request.user.id %}">
+                            <i class="fas fa-user" style="color: black;"></i>
+                        </a>
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -239,6 +242,9 @@
     <script src="{% static 'js/mixitup.min.js' %}"></script>
     <script src="{% static 'js/owl.carousel.min.js' %}"></script>
     <script src="{% static 'js/main.js'%}"></script>
+    <script src="{% static 'js/bootstrap.bundle.min.js'%}"></script>
+    <script src="{% static 'js/jquery.min.js'%}"></script>
+
 
 </body>>
 </html>
