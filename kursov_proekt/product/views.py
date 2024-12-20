@@ -121,10 +121,14 @@ class DashboardProducts(ListView):
                 wishlist = Wishlist.objects.get(user=self.request.user)
                 wishlist_items = WishlistItem.objects.filter(wishlist=wishlist)
                 context['wishlist_item'] = wishlist_items
+                wishlist_product_ids = [item.product.id for item in wishlist_items]
+                context['wishlist_item_ids'] = wishlist_product_ids  # Добавяме само ID-та
             except Wishlist.DoesNotExist:
                 context['wishlist_item'] = []  # No wishlist found for this user
+                context['wishlist_item_ids'] = []  # Няма wishlist за този потребител
         else:
             context['wishlist_item'] = []  # No wishlist for anonymous users
+            context['wishlist_item_ids'] = []  # Няма wishlist за анонимни потребители
 
         print(context['wishlist_item'])
 
@@ -246,6 +250,7 @@ class AddOrderItems(APIView):
 
         return Response({'products': product_data})
 
+
 def get_product_sizes(request, pk):
     try:
         product = Product.objects.get(id=pk)  # Вземаме продукта по ID
@@ -269,8 +274,6 @@ def get_product_sizes(request, pk):
 class ProductDetail(DetailView):
     template_name = 'shop-details/shop-details.html'
     model = Product
-
-
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

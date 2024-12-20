@@ -35,6 +35,7 @@ class HomePage(ListView):
 
         return context
 
+
 class ToggleWishlistView(APIView):
     permission_classes = [IsAuthenticated]
 

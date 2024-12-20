@@ -209,7 +209,9 @@ def add_to_order(request):
                 order.total_price += price
                 order.save()
 
-                return JsonResponse({'status': 'success', 'message': 'Item added to order', 'order_item_id': order_item.id})
+                return JsonResponse(
+                    {'status': 'success', 'message': 'Item added to order', 'order_item_id': order_item.id})
+
 
             elif accessory:
                 a = accessory.max_quantity_accessory
@@ -347,16 +349,16 @@ def update_cart_total(request):
         # Loop through all the order items and check if the size is valid
         for item in order.orders.all():
             if item.size:  # Only calculate if the size is not None
-                total_price += item.product.price * (item.size.max_size - item.size.stock_quantity)
+                total_price += item.product.price
             else:
-                total_price += item.product.price * (item.accessory.max_quantity_accessory - item.accessory.stock_quantity)
+                total_price += item.product.price
 
 
 
 
         return JsonResponse({
             'status': 'success',
-            'total_price': float(total_price)
+            'total_price': total_price
         })
     else:
         return JsonResponse({'status': 'error', 'message': 'User not authenticated'})
@@ -423,45 +425,68 @@ class FinalizeOrder(FormView):
     template_name = 'shop-details/checkout.html'
     form_class = BillingDetailsForm
     success_url = reverse_lazy('after_purchesing')  # Променете success_url на 'after', ако искате да пренасочвате към 'after-purchasing'
+    grouped_items = {}
 
     def get_context_data(self, **kwargs):
         total_price_for_same_products = 0
         pk = self.kwargs['pk']
-        try:
-            # Проверете дали поръчката съществува
-            order = Orders.objects.get(profile__pk=pk, status=False)
-        except Orders.DoesNotExist:
-            return redirect(self.success_url)  # Пренасочваме към success_url, ако поръчката не съществува
+        order = get_object_or_404(Orders, profile__pk=pk, status=False)
+        self.grouped_items = {}
 
-        # Fetch all order items
+        # Вземаме всички OrderItems за поръчката
         order_items = OrderItems.objects.filter(order=order)
 
-        # Group products by category and size
-        grouped_items = defaultdict(lambda: defaultdict(lambda: {'quantity': 0, 'total_price': 0.00}))
-
+        # Събиране на групираните продукти по категория и размер
         for item in order_items:
             product = item.product
             size = item.size
             accessory = item.accessory
             category = product.category.name.lower()
 
+            if category not in self.grouped_items:
+                self.grouped_items[category] = {}
+
             if size:
-                grouped_items[category][size]['product'] = product
-                grouped_items[category][size]['quantity'] += 1
-                grouped_items[category][size]['total_price'] += product.price
-                total_price_for_same_products += product.price
+                if size not in self.grouped_items:
+                    if size not in self.grouped_items[category]:
+                        self.grouped_items[category][size] = {
+                            'product': product,
+                            'quantity': 0,
+                            'total_price': 0.00
+                        }
+                    self.grouped_items[category][size]['quantity'] += 1
+                    self.grouped_items[category][size]['total_price'] = product.price
+                    total_price_for_same_products += product.price
 
             if accessory:
-                grouped_items[category][product.name]['product'] = product
-                grouped_items[category][product.name]['quantity'] += 1
-                grouped_items[category][product.name]['total_price'] += product.price
+                if accessory.product.name not in self.grouped_items[category]:
+                    self.grouped_items[category][product.name] = {
+                        'product': product,
+                        'quantity': 0,
+                        'total_price': 0.00,
+                        'type': 'accessory'
+                    }
+
+
+                self.grouped_items[category][product.name]['quantity'] += 1
+                self.grouped_items[category][product.name]['total_price'] = product.price
                 total_price_for_same_products += product.price
+
+        for same_item in self.grouped_items:
+            products = self.grouped_items[same_item]
+            if products:
+                pass
+
+            else:
+                pass
+            print(self.grouped_items[same_item])
+
 
         order.total_price = total_price_for_same_products
 
         context = super().get_context_data(**kwargs)
         context['order'] = order
-        context['grouped_items'] = grouped_items
+        context['grouped_items'] = self.grouped_items
         context['total_price_for_same_products'] = total_price_for_same_products
         context['form'] = self.get_form()  # Add the form to the context
         return context
@@ -474,7 +499,10 @@ class FinalizeOrder(FormView):
         except Orders.DoesNotExist:
             return redirect(self.success_url)  # Пренасочваме към success_url, ако поръчката не съществува
 
-        # Update product purchase counts and stock
+        for same_item in self.grouped_items:
+            print(self.grouped_items[same_item])
+
+
         for order_item in order.orders.all():
             product = order_item.product
             product.num_of_times_purchased += 1
