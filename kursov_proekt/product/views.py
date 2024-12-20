@@ -115,6 +115,8 @@ class DashboardProducts(ListView):
         context['total_accessories'] = len(self.object_list.filter(category__name='accessories'))
         context['total_shoes'] = len(self.object_list.filter(category__name='shoes'))
         context['is_staff'] = self.request.user.has_perm('product.can_create_products')
+        context['is_authenticated'] = self.request.user.is_authenticated
+        print(context['is_authenticated'])
 
         if self.request.user.is_authenticated:
             try:
