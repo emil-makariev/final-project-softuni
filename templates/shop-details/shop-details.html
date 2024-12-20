@@ -63,7 +63,10 @@
                             <h3>{{ object.price }} $</h3>
                             <p>{{ object.description }}</p>
                             <div class="product__details__option">
-                                <a href="javascript:void(0);" class="add-cart" data-product-id="{{ product.id }}" data-product-type="{{ product.category.name }}" data-accessory-id="{{product.accessory.id}}">+ Add To Cart</a>
+                                {% if is_authenticated %}
+
+
+                                <a href="javascript:void(0);" class="add-cart" data-product-id="{{ product.id }}" data-product-type="{{ product.category.name }}" data-accessory-id="{{product.accessory.id}}">+ Show sizes</a>
 
                                             <!-- Choose a size text (this will be shown when "Add to Cart" is clicked) -->
                                             <div id="choose-size-text-{{ product.id }}" style="display:none;">
@@ -81,13 +84,14 @@
                                                         </div>
                                                     </form>
                                                 </div>
+                                {% endif %}
                             </div>
                             {% if request.user.is_authenticated %}
                                 <div class="product__details__cart__option">
                                     <a href="#" class="primary-btn" id="add-to-cart-btn">add to cart</a>
                                 </div>
                                 <div class="product__details__btns__option">
-                                    <a href="#"><i class="fa fa-heart"></i> add to wishlist</a>
+                                    <a href="javascript:void(0);"  class="primary-btn" id="add-to-wishlist-btn" onclick="addToWishlist(this)" data-product-id="{{ pk_product }}"><i class="fa fa-heart"></i> add to wishlist</a>
                                 </div>
                             {% endif %}
                             <div class="product__details__last__option">
@@ -152,6 +156,7 @@
 
                                         <div class="product__item__text">
                                             <h6>{{ product.name }}</h6>
+                                            {% if is_authenticated %}
 
                                             <!-- Add to Cart button -->
                                             <a href="javascript:void(0);" class="add-cart" data-product-id="{{ product.id }}" data-product-type="{{ product.category.name }}" data-accessory-id="{{product.accessory.id}}">+ Add To Cart</a>
@@ -170,11 +175,12 @@
                                                         <div class="size-options" id="size-options-{{ product.id }}" style="display: flex; justify-content: space-around">
                                                             <!-- Dynamically generated size options -->
                                                         </div>
-                                                        {% if user_logged_in %}
+                                                        {% if is_authenticated %}
                                                             <button type="submit" class="btn btn-secondary">Add to Cart</button>
                                                         {% endif %}
                                                     </form>
                                                 </div>
+                                            {% endif %}
                                             <h5>{{ product.price }}</h5>
                                         </div>
                                     </div>
@@ -187,6 +193,76 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <script>
+    function addToWishlist(buttonElement) {
+        console.log(buttonElement)
+    // Вземаме ID-то на продукта от data атрибута на бутона
+    const productId = buttonElement.getAttribute('data-product-id');
+    if (!productId) {
+        console.error('Product ID not found.');
+        return;
+    }
+
+    // Проверяваме дали продуктът е в wish list (localStorage)
+    let wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
+
+    if (wishlist.includes(productId)) {
+        // Ако продуктът вече е в wish list, го премахваме
+        wishlist = wishlist.filter(id => id !== productId);
+        localStorage.setItem('wishlist', JSON.stringify(wishlist));
+
+        // Променяме текста на бутона обратно на "add to wishlist"
+        buttonElement.innerHTML = '<i class="fa fa-heart"></i> add to wishlist';
+
+        // Може да изпратим заявка към сървъра за премахване от wish list
+        fetch(`/api/toggle-wishlist/${productId}/`, {
+            method: 'DELETE', // Метод за премахване
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while removing from wishlist.');
+        });
+
+    } else {
+        // Ако продуктът не е в wish list, го добавяме
+        wishlist.push(productId);
+        localStorage.setItem('wishlist', JSON.stringify(wishlist));
+
+        // Променяме текста на бутона на "added"
+        buttonElement.innerHTML = '<i class="fa fa-heart"></i> added';
+
+        // Може да изпратим заявка към сървъра за добавяне в wish list
+        fetch(`/api/toggle-wishlist/${productId}/`, {
+            method: 'POST', // Метод за добавяне
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while adding to wishlist.');
+        });
+    }
+}
+
+
+
+// При зареждане на страницата възстановяваме състоянието на wish list
+document.addEventListener('DOMContentLoaded', function() {
+    const wishlistButton = document.getElementById('add-to-wishlist-btn');
+    const productId = wishlistButton.getAttribute('data-product-id');
+
+    // Проверяваме дали продуктът е в localStorage
+    let wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
+    if (wishlist.includes(productId)) {
+        // Ако продуктът е в wish list, променяме текста на бутона на "added"
+        wishlistButton.innerHTML = '<i class="fa fa-heart"></i> added';
+    }
+});
     document.addEventListener("DOMContentLoaded", function() {
         const wishlistButtons = document.querySelectorAll('.add-to-wishlist');
 
@@ -598,70 +674,6 @@
                 // Update the product count message dynamically (client-side)
                 $('.shop__product__option__left').html(`<p>${productCountMessage}</p>`);
 
-                response.products.forEach(function(product) {
-                    var productHTML = `
-                        <div class="col-lg-4 col-md-6 col-sm-6">
-                            <div class="product__item product-list" data-category="${product.category}">
-                                <div class="product__item__pic set-bg" data-setbg="${ product.main_image}">
-                                    <img src="${ product.main_image }" alt="${ product.name }">
-
-                                    <ul class="product__hover">
-                                        <li><a href=""><img src="{% static 'img/icon/heart.png' %}" alt=""></a><span>Like it</span></li>
-                                        <li><a href="#"><img src="{% static 'img/icon/compare.png' %}" alt=""> <span>Compare</span></a></li>
-                                        <li><a href="#"><img src="{% static 'img/icon/search.png' %}" alt=""></a><span>Search</span></li>
-                                    </ul>
-                                </div>
-
-                                <div class="product__item__text">
-                                    <h6>${ product.name }</h6>
-
-                                    <!-- Add to Cart button -->
-                                    <a href="javascript:void(0);" class="add-cart" data-product-id="${ product.id }">+ Add To Cart</a>
-
-                                    <!-- Choose a size text (this will be shown when "Add to Cart" is clicked) -->
-                                    <div id="choose-size-text-${ product.id }" style="display:none;">
-                                        <p>Choose a size</p>
-                                        <a href="javascript:void(0);" class="close-size-selection" data-product-id="${ product.id }">
-                                            <span class="icon_close"></span>
-                                        </a>
-                                    </div>
-
-                                    <!-- Size selection form (initially hidden) -->
-                                    <div class="size-selection-form" id="size-selection-${ product.id }" style="display:none;">
-                                        <form id="size-form-${ product.id }" class="size-form">
-                                            <div class="size-options" id="size-options-${ product.id }" style="display: flex; justify-content: space-around">
-                                                <!-- Dynamically generated size options -->
-                                            </div>
-                                            <button type="submit" class="btn btn-secondary">Add to Cart</button>
-                                        </form>
-                                    </div>
-
-                                    <div class="rating">
-                                        <i class="fa fa-star-o"></i>
-                                        <i class="fa fa-star-o"></i>
-                                        <i class="fa fa-star-o"></i>
-                                        <i class="fa fa-star-o"></i>
-                                        <i class="fa fa-star-o"></i>
-                                    </div>
-
-                                    <h5>${ product.price }</h5>
-                                    <div class="product__color__select">
-                                        <label for="pc-4">
-                                            <input type="radio" id="pc-4">
-                                        </label>
-                                        <label class="active black" for="pc-5">
-                                            <input type="radio" id="pc-5">
-                                        </label>
-                                        <label class="grey" for="pc-6">
-                                            <input type="radio" id="pc-6">
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                    $('#filtered-products').append(productHTML);
-                });
 
                 // Handle the "Add to Cart" button click
                 $('.add-cart').click(function(event) {

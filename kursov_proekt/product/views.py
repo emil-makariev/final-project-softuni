@@ -285,6 +285,10 @@ class ProductDetail(DetailView):
 
         context['similar_products'] = Product.objects.filter(is_active=True, category=category).exclude(id=product.id)
         context['pk_product'] = pk_product
+        context['is_authenticated'] = self.request.user.is_authenticated
+
+
+
         if self.request.user.is_authenticated:
             try:
                 wishlist = Wishlist.objects.get(user=self.request.user)

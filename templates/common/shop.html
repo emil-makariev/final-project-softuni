@@ -249,6 +249,9 @@
 
                                         <div class="product__item__text">
                                             <h6>{{ product.name }}</h6>
+
+                                            {% if is_authenticated %}
+
                                             <!-- Add to Cart button -->
                                             <a href="javascript:void(0);" class="add-cart" data-product-id="{{ product.id }}" data-product-type="{{ product.category.name }}" data-accessory-id="{{product.accessory.id}}">+ Add To Cart</a>
 
@@ -271,6 +274,7 @@
                                                         {% endif %}
                                                     </form>
                                                 </div>
+                                        {% endif %}
                                             <h5>{{ product.price|floatformat:2 }}</h5>
                                         </div>
                                     </div>
@@ -320,76 +324,60 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-        const wishlistButtons = document.querySelectorAll('.add-to-wishlist');
+    // Делегиране на събитие към родителския контейнер на продуктите
+    const filteredProductsContainer = document.getElementById('filtered-products');
 
-        wishlistButtons.forEach(function(button) {
-            button.addEventListener('click', function(event) {
-                event.preventDefault();
+    filteredProductsContainer.addEventListener('click', function(event) {
+        // Проверяваме дали събитието е върху елемент с клас 'add-to-wishlist'
+        if (event.target.closest('.add-to-wishlist')) {
+            const button = event.target.closest('.add-to-wishlist');
+            event.preventDefault();
 
-                const productId = this.closest('.wishlist-item').getAttribute('data-product-id');
-                const heartIcon = this.querySelector('img'); // Вземаме иконата на сърцето
+            const productId = button.closest('.wishlist-item').getAttribute('data-product-id');
+            const heartIcon = button.querySelector('img'); // Вземаме иконата на сърцето
 
-                // Изпращаме POST/DELETE заявка за добавяне/премахване на продукта от wishlist
-                fetch(`/api/toggle-wishlist/${productId}/`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': getCookie('csrftoken')
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    // Променяме иконата на сърцето в зависимост от резултата
-                    if (data.message === 'Product added to wishlist') {
-                        heartIcon.src = "{% static 'img/icon/heart-solid-svgrepo-com(1).svg' %}";
-                        console.log(heartIcon)
-                        console.log('Product added to wishlist')
-                    } else if (data.message === 'Product removed from wishlist') {
-                        heartIcon.src = "{% static 'img/icon/heart.png' %}";
-                        console.log(heartIcon)
-                        console.log('Product removed from wishlist')
-
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('An error occurred while toggling the wishlist.');
-                });
-            });
-        });
-    });
-
-    function getCookie(name) {
-        let cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-            const cookies = document.cookie.split(';');
-            for (let i = 0; i < cookies.length; i++) {
-                const cookie = cookies[i].trim();
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
+            // Изпращаме POST/DELETE заявка за добавяне/премахване на продукта от wishlist
+            fetch(`/api/toggle-wishlist/${productId}/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
                 }
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Променяме иконата на сърцето веднага, след отговор от сървъра
+                if (data.message === 'Product added to wishlist') {
+                    heartIcon.src = "{% static 'img/icon/heart-solid-svgrepo-com(1).svg' %}";
+                    console.log('Product added to wishlist');
+                } else if (data.message === 'Product removed from wishlist') {
+                    heartIcon.src = "{% static 'img/icon/heart.png' %}";
+                    console.log('Product removed from wishlist');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while toggling the wishlist.');
+            });
+        }
+    });
+});
+
+// Функция за получаване на CSRFToken
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
             }
         }
-        return cookieValue;
     }
-
-        var closeButton = document.querySelector('.icon_close');
-
-        // Add click event listener
-        closeButton.addEventListener('click', function() {
-            // Clear the search query (e.g., input field)
-            var searchInput = document.getElementById('searchbar');
-            searchInput.value = '';  // Clears the input field
-            console.log(searchInput)
-
-            // Optionally, you could also clear any other displayed search query
-            // For example, if you have a div or span showing the search query, clear it:
-            var displayedQuery = document.getElementById('displayedSearchQuery');
-            if (displayedQuery) {
-                displayedQuery.textContent = '';  // Clear the displayed query
-            }
-        });
+    return cookieValue;
+}
 
         $(document).ready(function() {
     // Обработване на клик върху бутона "Add to Cart" (показване на формата за избор на размер)
@@ -733,7 +721,7 @@
                 var wishlistItems = {{ wishlist_item_ids|safe }};  // JSON форматиран списък с ID-та на продуктите // Примерен списък с желания (тук продуктите са с уникален ID)
                 var isStaff = {{ is_staff|yesno:"true,false" }}; // Преобразувай стойността на Python булево в JavaScript
                 var hasPerm = isStaff; // Променете на 'false', ако потребителят няма разрешение за редактиране на продукта
-
+                var isAuthenticated = {{ is_authenticated|yesno:"true,false" }};
 
                 response.products.forEach(function(product) {
                    var productHTML = `
@@ -748,50 +736,51 @@
                                         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
                                         <li class="wishlist-item" data-product-id="${product.id}">
                                             <a href="javascript:void(0);" class="add-to-wishlist">
-                                                ${hasPerm ?
-                                                    (wishlistItems.some(item => item.product_id === product.id) ?
-                                                        `<img src="/static/img/icon/heart-solid-svgrepo-com(1).svg" alt="">` :
-                                                        `<img src="/static/img/icon/heart.png" alt="">`)
+                                                ${isAuthenticated ?
+                                                    (wishlistItems.includes(product.id) ?
+
+                                                        `<img src="/static/img/icon/heart.png" alt="">` :
+                                                        `<img src="/static/img/icon/heart-solid-svgrepo-com(1).svg" alt="">`)
                                                     :
-                                                    `<img src="/static/img/icon/heart.png" alt="">`}
+                                                    ``}  <!-- Не показваме сърце, ако не е аутентифициран -->
                                             </a>
                                             <span>Like it</span>
                                         </li>
                                         <!-- Edit Product (if hasPerm) -->
                                         ${hasPerm ?
-                                            `<li><a href="/product/edit/${product.id}"><img src="/static/img/icon/pen-to-square-regular.svg" alt=""></a><span>Edit Product</span></li>`
+                                            `<li><a href="/product/product-edit/${product.id}"><img src="/static/img/icon/pen-to-square-regular.svg" alt=""></a><span>Edit Product</span></li>`
                                             : ""}
                                     </ul>
                                 </div>
 
                                 <div class="product__item__text">
-                                    <h6>${product.name}</h6>
+                    <h6>${product.name}</h6>
 
-                                    <!-- Add to Cart button -->
-                                    <a href="javascript:void(0);" class="add-cart" data-product-id="${product.id}" data-product-type="${product.category}">+ Add To Cart</a>
+                    ${isAuthenticated ? `
+                        <!-- Add to Cart button -->
+                        <a href="javascript:void(0);" class="add-cart" data-product-id="${product.id}" data-product-type="${product.category.name}" data-accessory-id="${product.accessory.id}">+ Add To Cart</a>
 
-                                    <!-- Choose a size text (this will be shown when "Add to Cart" is clicked) -->
-                                    <div id="choose-size-text-${product.id}" style="display:none;">
-                                        <p>Choose a size</p>
-                                        <a href="javascript:void(0);" class="close-size-selection" data-product-id="${product.id}">
-                                            <span class="icon_close"></span>
-                                        </a>
-                                    </div>
+                        <!-- Choose a size text (this will be shown when "Add to Cart" is clicked) -->
+                        <div id="choose-size-text-${product.id}" style="display:none;">
+                            <p>Choose a size</p>
+                            <a href="javascript:void(0);" class="close-size-selection" data-product-id="${product.id}">
+                                <span class="icon_close"></span>
+                            </a>
+                        </div>
 
-                                    <!-- Size selection form (initially hidden) -->
-                                    <div class="size-selection-form" id="size-selection-${product.id}" style="display:none;">
-                                        <form id="size-form-${product.id}" class="size-form">
-                                            <div class="size-options" id="size-options-${product.id}" style="display: flex; justify-content: space-around">
-                                                <!-- Dynamically generated size options -->
-                                            </div>
-                                            <button type="submit" class="btn btn-secondary">Add to Cart</button>
-                                        </form>
-                                    </div>
-
-                                    <!-- Product Price formatted to 2 decimal places -->
-                                    <h5>${(product.price).toFixed(2)}</h5>
-
+                        <!-- Size selection form (initially hidden) -->
+                        <div class="size-selection-form" id="size-selection-${product.id}" style="display:none;">
+                            <form id="size-form-${product.id}" class="size-form">
+                                <div class="size-options" id="size-options-${product.id}" style="display: flex; justify-content: space-around">
+                                    <!-- Dynamically generated size options -->
                                 </div>
+                                <button type="submit" class="btn btn-secondary">Add to Cart</button>
+                            </form>
+                        </div>
+                    ` : ''} <!-- Покажи бутона за добавяне в кошницата само ако потребителят е аутентифициран -->
+
+                    <h5>${(product.price).toFixed(2)}</h5>
+                </div>
                             </div>
                         </div>
                     `;
