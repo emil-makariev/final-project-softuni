@@ -339,29 +339,40 @@ def remove_from_order(request):
     return JsonResponse({'status': 'error', 'message': 'Invalid request method'}, status=400)
 
 
-def update_cart_total(request):
-    if request.user.is_authenticated:
-        # Get the user's order which is in progress
-        order = Orders.objects.get(profile=request.user.profile, status=False)
-
-        total_price = 0.00
-
-        # Loop through all the order items and check if the size is valid
-        for item in order.orders.all():
-            if item.size:  # Only calculate if the size is not None
-                total_price += item.product.price
-            else:
-                total_price += item.product.price
+@sync_to_async
+def get_authenticated_user(request):
+    return request.user if request.user.is_authenticated else None
 
 
+# Функция за извличане на поръчката на потребителя
+@sync_to_async
+def get_order_for_user(user):
+    return Orders.objects.get(profile=user.profile, status=False)
 
 
-        return JsonResponse({
-            'status': 'success',
-            'total_price': total_price
-        })
-    else:
-        return JsonResponse({'status': 'error', 'message': 'User not authenticated'})
+@sync_to_async
+def calculate_cart_total(order):
+    total_price = 0.00
+    for item in order.orders.all():
+        total_price += item.product.price
+    return total_price
+
+
+async def update_cart_total(request):
+    user = await get_authenticated_user(request)
+
+    if user:
+        # Получаваме поръчката за потребителя
+        try:
+            order = await get_order_for_user(user)
+        except Orders.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'No active order found for this user'})
+
+        # Изчисляваме общата стойност на количката
+        total_price = await calculate_cart_total(order)
+        return JsonResponse({'status': 'success', 'total_price': total_price})
+
+    return JsonResponse({'status': 'error', 'message': 'User not authenticated'})
 
 
 @csrf_exempt
