@@ -35,11 +35,8 @@
         <div class="container mt-5 text-center">
             <h1>You have been successfully signed up!</h1>
             <h2>Enjoy your stay</h2>
+            <a href="{% url 'common' %}">Return to the main page</a>
         </div>
-
-        <a href="{% url 'common' %}" class="arrow-btn">
-            <i class="bi bi-arrow-right"></i>
-        </a>
     {% endif %}
 </body>
 </html>

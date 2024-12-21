@@ -219,7 +219,6 @@
                                             </a>
 
                                             <ul class="product__hover">
-                                                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
                                                 <li  class="wishlist-item" data-product-id="{{ product.id }}" >
                                                     <a href="javascript:void(0);" class="add-to-wishlist">
                                                     {% if request.user.is_authenticated %}
@@ -718,7 +717,8 @@ function getCookie(name) {
 
                 // Update the product count message dynamically (client-side)
                 $('.shop__product__option__left').html(`<p>${productCountMessage}</p>`);
-                var wishlistItems = {{ wishlist_item_ids|safe }};  // JSON форматиран списък с ID-та на продуктите // Примерен списък с желания (тук продуктите са с уникален ID)
+                var wishlistItems = {{ wishlist_item_ids|safe }};
+                console.log(wishlistItems)// JSON форматиран списък с ID-та на продуктите // Примерен списък с желания (тук продуктите са с уникален ID)
                 var isStaff = {{ is_staff|yesno:"true,false" }}; // Преобразувай стойността на Python булево в JavaScript
                 var hasPerm = isStaff; // Променете на 'false', ако потребителят няма разрешение за редактиране на продукта
                 var isAuthenticated = {{ is_authenticated|yesno:"true,false" }};
@@ -736,9 +736,11 @@ function getCookie(name) {
                         <li class="wishlist-item" data-product-id="${product.id}">
                             <a href="javascript:void(0);" class="add-to-wishlist">
                                 ${isAuthenticated ?
-                                    (wishlistItems.length === 0 || wishlistItems.includes(product.id) ?
-                                        `<img src="/static/img/icon/heart-solid-svgrepo-com(1).svg" alt="">` :
-                                        `<img src="/static/img/icon/heart.png" alt="">`)
+                                    (wishlistItems.includes(product.id) ?
+
+                                        `<img src="/static/img/icon/heart-solid-svgrepo-com(1).svg" alt="">`:
+
+                                        `<img src="/static/img/icon/heart.png" alt="">` )
                                     :
                                     ``} <!-- Празно сърце, ако не е аутентифициран -->
                             </a>

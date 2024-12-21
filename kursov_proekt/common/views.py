@@ -12,6 +12,8 @@ from .models import Product, Wishlist, WishlistItem
 from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import render, redirect
 
+from ..accounts.models import Profile
+
 
 # Create your views here.
 
@@ -32,6 +34,8 @@ class HomePage(ListView):
         # Add best_sellers to the context
         context['best_sellers'] = best_sellers
         context['new_arrivals'] = new_arrivals
+
+
 
         return context
 

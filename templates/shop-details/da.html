@@ -1,0 +1,57 @@
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+    const wishlistButton = document.getElementById('add-to-wishlist-btn');
+    const productId = wishlistButton.getAttribute('data-product-id');
+
+    // Проверяваме дали продуктът е в localStorage
+    let wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
+    if (wishlist.includes(productId)) {
+        // Ако продуктът е в wish list, променяме текста на бутона на "added"
+        wishlistButton.innerHTML = '<i class="fa fa-heart"></i> added';
+    }
+});
+    document.addEventListener("DOMContentLoaded", function() {
+        const wishlistButtons = document.querySelectorAll('.add-to-wishlist');
+
+        wishlistButtons.forEach(function(button) {
+            button.addEventListener('click', function(event) {
+                event.preventDefault();
+
+                const productId = this.closest('.wishlist-item').getAttribute('data-product-id');
+                const heartIcon = this.querySelector('img'); // Вземаме иконата на сърцето
+
+                // Изпращаме POST/DELETE заявка за добавяне/премахване на продукта от wishlist
+                fetch(`/api/toggle-wishlist/${productId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Променяме иконата на сърцето в зависимост от резултата
+                    if (data.message === 'Product added to wishlist') {
+                        heartIcon.src = "{% static 'img/icon/heart-solid-svgrepo-com(1).svg' %}";
+                        console.log(heartIcon)
+                        console.log('Product added to wishlist')
+                    } else if (data.message === 'Product removed from wishlist') {
+                        heartIcon.src = "{% static 'img/icon/heart.png' %}";
+                        console.log(heartIcon)
+                        console.log('Product removed from wishlist')
+
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while toggling the wishlist.');
+                });
+            });
+        });
+    });
+
+
+
+
+
+</script>

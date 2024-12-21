@@ -126,7 +126,9 @@
                                     <li><a href="{% url 'about-us' %}">About Us</a></li>
                                     {% if user_logged_in %}
                                         <li><a href="{% url 'all-products-carts' view.request.user.id  %}">Shopping Cart</a></li>
-                                        <li><a href="{% url 'check_out' view.request.user.id%}">Check Out</a></li>
+                                        {% if has_active_orders %}
+                                            <li><a href="{% url 'check_out' view.request.user.id%}">Check Out</a></li>
+                                        {% endif %}
                                     {% endif %}
                                 </ul>
                             </li>

@@ -1,5 +1,8 @@
 from django.template.response import TemplateResponse
 
+from kursov_proekt.orders.models import Orders
+
+
 class ContextModification:
     def __init__(self, get_response):
         self.get_response = get_response
@@ -22,5 +25,8 @@ class ContextModification:
             permissions = request.user.get_group_permissions()
             response.context_data['has_perm'] = 'product.can_create_products' in permissions
 
+            valid_orders = Orders.objects.filter(status=False, profile_id=request.user.id)
+            response.context_data['has_active_orders'] = valid_orders.exists()
+            # Check if the user has any active (incomplete) orders
         return response
 

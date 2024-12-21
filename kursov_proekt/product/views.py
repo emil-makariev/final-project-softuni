@@ -25,7 +25,7 @@ from kursov_proekt.product.serializers import ProductSerializer
 class DashboardProducts(ListView):
     model = Product
     template_name = 'common/shop.html'
-    paginate_by = 12
+    paginate_by = 1
 
     def get_queryset(self):
         queryset = Product.objects.filter(is_active=True)  # Само активни продукти

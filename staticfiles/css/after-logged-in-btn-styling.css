@@ -1,0 +1,26 @@
+.arrow-btn {
+    position: fixed; /* Fixed position in the viewport */
+    top: 20px; /* Adjust to position it a bit from the top */
+    right: 20px; /* Position it 20px from the right */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #007bff; /* Bootstrap primary color */
+    color: white;
+    font-size: 24px;
+    padding: 10px 15px; /* Add some padding to the button */
+    border-radius: 50%; /* Make the button circular */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); /* Add some shadow for a floating effect */
+    transition: background-color 0.3s, transform 0.3s; /* Smooth transition on hover */
+    text-decoration: none; /* Remove underline */
+}
+
+.arrow-btn:hover {
+    background-color: #0056b3; /* Darken the background color on hover */
+    transform: scale(1.1); /* Slightly scale the button on hover */
+}
+
+/* Optional: Add margin to separate the icon from the edge of the circle */
+.arrow-btn i {
+    margin-right: 5px;
+}

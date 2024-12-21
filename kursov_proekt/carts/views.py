@@ -435,43 +435,42 @@ def remove_product_from_order(request):
 class FinalizeOrder(FormView):
     template_name = 'shop-details/checkout.html'
     form_class = BillingDetailsForm
-    success_url = reverse_lazy('after_purchesing')  # Променете success_url на 'after', ако искате да пренасочвате към 'after-purchasing'
-    grouped_items = {}
+    success_url = reverse_lazy('after_purchesing')
 
     def get_context_data(self, **kwargs):
         total_price_for_same_products = 0
         pk = self.kwargs['pk']
         order = get_object_or_404(Orders, profile__pk=pk, status=False)
-        self.grouped_items = {}
 
         # Вземаме всички OrderItems за поръчката
         order_items = OrderItems.objects.filter(order=order)
 
         # Събиране на групираните продукти по категория и размер
+        grouped_items = {}
         for item in order_items:
             product = item.product
             size = item.size
             accessory = item.accessory
             category = product.category.name.lower()
 
-            if category not in self.grouped_items:
-                self.grouped_items[category] = {}
+            if category not in grouped_items:
+                grouped_items[category] = {}
 
             if size:
-                if size not in self.grouped_items:
-                    if size not in self.grouped_items[category]:
-                        self.grouped_items[category][size] = {
+                if size not in grouped_items:
+                    if size not in grouped_items[category]:
+                        grouped_items[category][size] = {
                             'product': product,
                             'quantity': 0,
                             'total_price': 0.00
                         }
-                    self.grouped_items[category][size]['quantity'] += 1
-                    self.grouped_items[category][size]['total_price'] = product.price
-                    total_price_for_same_products += product.price
+                grouped_items[category][size]['quantity'] += 1
+                grouped_items[category][size]['total_price'] = product.price
+                total_price_for_same_products += product.price
 
             if accessory:
-                if accessory.product.name not in self.grouped_items[category]:
-                    self.grouped_items[category][product.name] = {
+                if accessory.product.name not in grouped_items[category]:
+                    grouped_items[category][product.name] = {
                         'product': product,
                         'quantity': 0,
                         'total_price': 0.00,
@@ -479,25 +478,15 @@ class FinalizeOrder(FormView):
                     }
 
 
-                self.grouped_items[category][product.name]['quantity'] += 1
-                self.grouped_items[category][product.name]['total_price'] = product.price
+                grouped_items[category][product.name]['quantity'] += 1
+                grouped_items[category][product.name]['total_price'] = product.price
                 total_price_for_same_products += product.price
-
-        for same_item in self.grouped_items:
-            products = self.grouped_items[same_item]
-            if products:
-                pass
-
-            else:
-                pass
-            print(self.grouped_items[same_item])
-
 
         order.total_price = total_price_for_same_products
 
         context = super().get_context_data(**kwargs)
         context['order'] = order
-        context['grouped_items'] = self.grouped_items
+        context['grouped_items'] = grouped_items
         context['total_price_for_same_products'] = total_price_for_same_products
         context['form'] = self.get_form()  # Add the form to the context
         return context
@@ -505,41 +494,35 @@ class FinalizeOrder(FormView):
     def form_valid(self, form):
         # Get the order using the 'pk' from kwargs
         pk = self.kwargs['pk']
-        try:
-            order = Orders.objects.get(profile__pk=pk, status=False)
-        except Orders.DoesNotExist:
-            return redirect(self.success_url)  # Пренасочваме към success_url, ако поръчката не съществува
+        order = get_object_or_404(Orders, profile__pk=pk, status=False)
 
-        for same_item in self.grouped_items:
-            print(self.grouped_items[same_item])
-
-
+        # Актуализиране на num_of_times_purchased за всеки продукт в поръчката
         for order_item in order.orders.all():
             product = order_item.product
             product.num_of_times_purchased += 1
 
             if product.sizes.exists():
                 if product.sizes.all().count() > 0:
-                    # Check if all sizes are out of stock
+                    # Проверка дали всички размери на продукта имат stock_quantity == 0
                     all_sizes_out_of_stock = product.sizes.all().filter(stock_quantity__gt=0).count() == 0
+
+                    # Ако всички размери са извън наличност, задаваме is_active = False
                     if all_sizes_out_of_stock:
                         product.is_active = False
                         product.save()
-                    # product.sizes.max_quantity -=
 
             else:
                 if product.accessory.stock_quantity <= 0:
                     product.accessory.stock_quantity = 0
                     product.is_active = False
                     product.save()
-                # product.accessory.max_quantity_accessory -=
 
-        # Set the order as complete
+        # Премахваме всички OrderItem-и за поръчката
         order.status = True
         order.save()
         order.orders.all().delete()
 
-        # Save the form with the order_id
+        # Пренасочваме към success страница
         form = form.save(commit=False)
         form.order_id = order.id
         form.save()

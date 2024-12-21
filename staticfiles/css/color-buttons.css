@@ -1,0 +1,21 @@
+/* Basic circle styles for each label */
+
+/* When a color is selected, add a black border */
+.color-filter {
+    display: inline-block;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: outline 0.3s ease; /* Smooth transition for outline */
+}
+
+/* When a color is selected, apply an outline */
+.color-filter.selected {
+    outline: 3px solid black;  /* Outline outside the element */
+}
+
+/* Hide the radio buttons */
+input[type="radio"] {
+    display: none;
+}
