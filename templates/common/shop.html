@@ -724,68 +724,67 @@ function getCookie(name) {
                 var isAuthenticated = {{ is_authenticated|yesno:"true,false" }};
 
                 response.products.forEach(function(product) {
-                   var productHTML = `
-                        <div class="col-lg-4 col-md-6 col-sm-6">
-                            <div class="product__item product-list" data-category="${product.category}">
-                                <div class="product__item__pic set-bg" data-setbg="${product.main_image}">
-                                    <a href="/product/product-details/${product.id}">
-                                        <img src="${product.main_image}" alt="${product.name}">
-                                    </a>
-                                    <ul class="product__hover">
-                                        <!-- Wishlist Item Logic -->
-                                        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-                                        <li class="wishlist-item" data-product-id="${product.id}">
-                                            <a href="javascript:void(0);" class="add-to-wishlist">
-                                                ${isAuthenticated ?
-                                                    (wishlistItems.includes(product.id) ?
-
-                                                        `<img src="/static/img/icon/heart.png" alt="">` :
-                                                        `<img src="/static/img/icon/heart-solid-svgrepo-com(1).svg" alt="">`)
-                                                    :
-                                                    ``}  <!-- Не показваме сърце, ако не е аутентифициран -->
-                                            </a>
-                                            <span>Like it</span>
-                                        </li>
-                                        <!-- Edit Product (if hasPerm) -->
-                                        ${hasPerm ?
-                                            `<li><a href="/product/product-edit/${product.id}"><img src="/static/img/icon/pen-to-square-regular.svg" alt=""></a><span>Edit Product</span></li>`
-                                            : ""}
-                                    </ul>
-                                </div>
-
-                                <div class="product__item__text">
+    var productHTML = `
+        <div class="col-lg-4 col-md-6 col-sm-6">
+            <div class="product__item product-list" data-category="${product.category}">
+                <div class="product__item__pic set-bg" data-setbg="${product.main_image}">
+                    <a href="/product/product-details/${product.id}">
+                        <img src="${product.main_image}" alt="${product.name}">
+                    </a>
+                    <ul class="product__hover">
+                        <!-- Wishlist Item Logic -->
+                        <li class="wishlist-item" data-product-id="${product.id}">
+                            <a href="javascript:void(0);" class="add-to-wishlist">
+                                ${isAuthenticated ?
+                                    (wishlistItems.length === 0 || wishlistItems.includes(product.id) ?
+                                        `<img src="/static/img/icon/heart-solid-svgrepo-com(1).svg" alt="">` :
+                                        `<img src="/static/img/icon/heart.png" alt="">`)
+                                    :
+                                    ``} <!-- Празно сърце, ако не е аутентифициран -->
+                            </a>
+                            <span>Like it</span>
+                        </li>
+                        ${hasPerm ?
+                            `<li><a href="/product/product-edit/${product.id}"><img src="/static/img/icon/pen-to-square-regular.svg" alt=""></a><span>Edit Product</span></li>`
+                            : ""}
+                    </ul>
+                </div>
+                            ${isAuthenticated ?
+                `<div class="product__item__text">
                     <h6>${product.name}</h6>
 
-                    ${isAuthenticated ? `
-                        <!-- Add to Cart button -->
-                        <a href="javascript:void(0);" class="add-cart" data-product-id="${product.id}" data-product-type="${product.category.name}" data-accessory-id="${product.accessory.id}">+ Add To Cart</a>
+                    <!-- Add to Cart button -->
+                    <a href="javascript:void(0);" class="add-cart" data-product-id="${product.id}" data-product-type="${product.category}">+ Add To Cart</a>
 
-                        <!-- Choose a size text (this will be shown when "Add to Cart" is clicked) -->
-                        <div id="choose-size-text-${product.id}" style="display:none;">
-                            <p>Choose a size</p>
-                            <a href="javascript:void(0);" class="close-size-selection" data-product-id="${product.id}">
-                                <span class="icon_close"></span>
-                            </a>
-                        </div>
+                    <!-- Choose a size text (this will be shown when "Add to Cart" is clicked) -->
+                    <div id="choose-size-text-${product.id}" style="display:none;">
+                        <p>Choose a size</p>
+                        <a href="javascript:void(0);" class="close-size-selection" data-product-id="${product.id}">
+                            <span class="icon_close"></span>
+                        </a>
+                    </div>
 
-                        <!-- Size selection form (initially hidden) -->
-                        <div class="size-selection-form" id="size-selection-${product.id}" style="display:none;">
-                            <form id="size-form-${product.id}" class="size-form">
-                                <div class="size-options" id="size-options-${product.id}" style="display: flex; justify-content: space-around">
-                                    <!-- Dynamically generated size options -->
-                                </div>
-                                <button type="submit" class="btn btn-secondary">Add to Cart</button>
-                            </form>
-                        </div>
-                    ` : ''} <!-- Покажи бутона за добавяне в кошницата само ако потребителят е аутентифициран -->
-
-                    <h5>${(product.price).toFixed(2)}</h5>
-                </div>
+                    <!-- Size selection form (initially hidden) -->
+                    <div class="size-selection-form" id="size-selection-${product.id}" style="display:none;">
+                        <form id="size-form-${product.id}" class="size-form">
+                            <div class="size-options" id="size-options-${product.id}" style="display: flex; justify-content: space-around">
+                                <!-- Dynamically generated size options -->
                             </div>
-                        </div>
-                    `;
-                    $('#filtered-products').append(productHTML);
-                });
+                            <button type="submit" class="btn btn-secondary">Add to Cart</button>
+                        </form>
+                    </div>
+                </div>`
+            :
+                `<div class="product__item__text">
+                    <h6>${product.name}</h6>
+                    <p>Please log in to add to cart.</p>
+                </div>`}
+                                    <h5>${(product.price).toFixed(2)}</h5>
+            </div>
+        </div>
+    `;
+    $('#filtered-products').append(productHTML);
+});
 
                 $('.add-cart').click(function(event) {
                     event.preventDefault();  // Prevent default action
